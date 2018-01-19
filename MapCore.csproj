@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2ACEA999-067C-4E28-A108-1A0C14230433}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MapCore</RootNamespace>
+    <AssemblyName>MapCore</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\MapCore.XML</DocumentationFile>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Utils.cs" />
+    <Compile Include="Cfg.cs" />
+    <Compile Include="MemoryReader.cs" />
+    <Compile Include="Enum\Levels.cs" />
+    <Compile Include="Enum\LightType.cs" />
+    <Compile Include="Events\LogArgs.cs" />
+    <Compile Include="Events\PaintingArgs.cs" />
+    <Compile Include="ImageManager.cs" />
+    <Compile Include="MapManager.cs" />
+    <Compile Include="Models\CFG\PropInfo.cs" />
+    <Compile Include="Models\CFG\TextureInfo.cs" />
+    <Compile Include="Models\K2DPosition.cs" />
+    <Compile Include="Models\K3DPosition.cs" />
+    <Compile Include="Models\KColor.cs" />
+    <Compile Include="Models\NFC\LocationInfo.cs" />
+    <Compile Include="Models\NFE\EventAreaScript.cs" />
+    <Compile Include="Models\NFL\K3DVector.cs" />
+    <Compile Include="Models\NFL\StructLights.cs" />
+    <Compile Include="Models\NFM\GrassColony.cs" />
+    <Compile Include="Models\NFM\K3DLight.cs" />
+    <Compile Include="Models\NFM\KGrass.cs" />
+    <Compile Include="Models\NFM\KGrassProp.cs" />
+    <Compile Include="Models\NFM\KProp.cs" />
+    <Compile Include="Models\NFM\KProperties.cs" />
+    <Compile Include="Models\NFM\KSegment.cs" />
+    <Compile Include="Models\NFM\KVertex.cs" />
+    <Compile Include="Models\NFP\RecordNfp.cs" />
+    <Compile Include="Models\NFS\Location.cs" />
+    <Compile Include="Models\NFS\PropScriptInfo.cs" />
+    <Compile Include="Models\NFW\Water.cs" />
+    <Compile Include="Models\Polygon2.cs" />
+    <Compile Include="Models\Polygon3.cs" />
+    <Compile Include="Models\PVS\PVS_PROP_V1.cs" />
+    <Compile Include="Models\PVS\PVS_SEGMENT_V1.cs" />
+    <Compile Include="Models\QPF\Prop.cs" />
+    <Compile Include="Nfa.cs" />
+    <Compile Include="Nfc.cs" />
+    <Compile Include="Nfe.cs" />
+    <Compile Include="Nfl.cs" />
+    <Compile Include="Nfm.cs" />
+    <Compile Include="Nfp.cs" />
+    <Compile Include="Nfs.cs" />
+    <Compile Include="Nfw.cs" />
+    <Compile Include="Pvs.cs" />
+    <Compile Include="Qpf.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataCore\DataCore.csproj">
+      <Project>{f234efe9-3104-45fc-a5be-fdc3d0cd888e}</Project>
+      <Name>DataCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
