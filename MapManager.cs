@@ -3,6 +3,7 @@ using MapCore.Enum;
 using MapCore.Events;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -40,35 +41,12 @@ namespace MapCore
 		/// <summary>
 		/// Real name of the file
 		/// </summary>
-		public string Name => $"m{X.ToString("000")}_{Y.ToString("000")}";
+		public string Name => $"m{Location.X.ToString("000")}_{Location.Y.ToString("000")}";
 
 		/// <summary>
 		/// Map coordonate x
 		/// </summary>
-		private byte x = 0;
-		public byte X
-		{
-			get { return x; }
-			set
-			{
-				Pvs.MapStartPosX = value;
-				x = value;
-			}
-		}
-
-		/// <summary>
-		/// Map coordonate y
-		/// </summary>
-		private byte y = 0;
-		public byte Y
-		{
-			get { return y; }
-			set
-			{
-				Pvs.MapStartPosY = value;
-				y = value;
-			}
-		}
+		private Point Location = new Point();
 
 		/// <summary>
 		/// Event when painting
@@ -98,7 +76,7 @@ namespace MapCore
 			///Collision file
 			Nfa = new Nfa(this);
 			Nfa.Added += (o, e) => Refresh();
-			Nfa.Painting += (o, e) => Refresh(false);
+			Nfa.Rendering += (o, e) => Refresh(false);
 			Nfa.Removed += (o, e) => Refresh();
 
 			///Region file
@@ -202,13 +180,12 @@ namespace MapCore
 		/// <summary>
 		/// Make new project
 		/// </summary>
-		public void New(string folder, string file)
+		public void New(string file)
 		{
 			Dispose();
 			ResolveName(file);
 
-			Log(Levels.Info, $"New project map {file} from path {folder}.\n");
-			Log(Levels.Info, "Map create completed.");
+			Log(Levels.Info, $"New project map {file}.\n");
 		}
 
 		/// <summary>
@@ -220,13 +197,13 @@ namespace MapCore
 			var match = Regex.Matches(name, "[0-9]+");
 			if (match.Count == 2)
 			{
-				X = byte.Parse(match[0].Value);
-				Y = byte.Parse(match[1].Value);
+				Location.X = int.Parse(match[0].Value);
+				Location.Y = int.Parse(match[1].Value);
 			}
 			else
 			{
-				X = 0;
-				Y = 0;
+				Location.X = 0;
+				Location.Y = 0;
 			}
 		}
 
