@@ -2,7 +2,6 @@
 using MapCore.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace MapCore
 {
@@ -27,10 +26,10 @@ namespace MapCore
 		/// <param name="buffer"></param>
 		public void LoadProp(byte[] buffer)
 		{
-			Props = new List<PropInfo>();
+			Props.Clear();
 			try
 			{
-				using (StreamReader b = new StreamReader(new MemoryStream(buffer)))
+				using (MemoryReader b = new MemoryReader(buffer))
 				{
 					string line;
 
@@ -85,10 +84,10 @@ namespace MapCore
 		/// <param name="buffer"></param>
 		public void LoadTexture(byte[] buffer)
 		{
-			Textures = new List<TextureInfo>();
+			Textures.Clear();
 			try
 			{
-				using (StreamReader b = new StreamReader(new MemoryStream(buffer)))
+				using (MemoryReader b = new MemoryReader(buffer))
 				{
 					string line;
 
