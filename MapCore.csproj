@@ -51,6 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\AddedArgs.cs" />
+    <Compile Include="Events\RenderArgs.cs" />
+    <Compile Include="Events\RemovedArgs.cs" />
+    <Compile Include="Events\UpdatedArgs.cs" />
+    <Compile Include="MemoryWriter.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Cfg.cs" />
     <Compile Include="MemoryReader.cs" />
