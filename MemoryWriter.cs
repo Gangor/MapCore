@@ -8,6 +8,17 @@ namespace MapCore
 	{
 		public MemoryWriter() { }
 
+		// Clear the memory stream.
+		//
+		//
+		public void Clear()
+		{
+			byte[] buffer = GetBuffer();
+			Array.Clear(buffer, 0, buffer.Length);
+			Position = 0;
+			SetLength(0);
+		}
+
 		// Writes a boolean to this stream. A single byte is written to the stream
 		// with the value 0 representing false or the value 1 representing true.
 		// 
