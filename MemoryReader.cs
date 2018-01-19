@@ -24,14 +24,20 @@ namespace MapCore
 		{
 			return (sbyte)ReadByte();
 		}
-		
+
 		public virtual byte[] ReadBytes(int lenght)
 		{
 			byte[] buffer = new byte[lenght];
 			Read(buffer, 0, lenght);
 			return buffer;
 		}
-		
+
+		public virtual char ReadChar()
+		{
+			byte[] buffer = ReadBytes(1);
+			return BitConverter.ToChar(buffer, 0);
+		}
+
 		public virtual char ReadChar(int lenght)
 		{
 			byte[] buffer = new byte[lenght];
@@ -132,6 +138,21 @@ namespace MapCore
 			byte[] buffer = new byte[lenght];
 			Read(buffer, 0, lenght);
 			return Encoding.Default.GetString(buffer, 0, lenght);
+		}
+
+		public virtual string ReadLine()
+		{
+			StringBuilder sb = new StringBuilder();
+			char ch;
+
+			while ((ch = ReadChar()) != '\0')
+			{
+				if (ch == '\r' || ch == '\n')
+					return sb.ToString();
+				
+				sb.Append(ch);
+			} 
+			return sb.ToString();
 		}
 		
 		public void Skip(long num)
