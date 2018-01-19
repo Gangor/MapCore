@@ -1,4 +1,5 @@
 ﻿using MapCore.Enum;
+using MapCore.Events;
 using MapCore.Models;
 using System;
 using System.Collections.Generic;
@@ -12,16 +13,16 @@ namespace MapCore
 
 		public MapManager Parent { get; }
 
-		public event EventHandler<Polygon2> Added;
-		public event EventHandler<EventArgs> Painting;
-		public event EventHandler<EventArgs> Removed;
+		public event EventHandler<AddedArgs> Added;
+		public event EventHandler<RemovedArgs> Removed;
+		public event EventHandler<RenderArgs> Rendering;
+		public event EventHandler<UpdatedArgs> Updated;
 
 		/// <summary>
 		/// Initialize a new instance
 		/// </summary>
 		public Nfa(MapManager parent)
 		{
-			Blank();
 			Parent = parent;
 		}
 
@@ -34,7 +35,7 @@ namespace MapCore
 			var polygon = Polygon2.FromPoints(points);
 			Polygons.Add(polygon);
 
-			Added?.Invoke(this, polygon);
+			Added?.Invoke(this, new AddedArgs(Polygons, typeof(List<Polygon2>)));
 		}
 
 		/// <summary>
@@ -51,34 +52,32 @@ namespace MapCore
 		/// <returns></returns>
 		public byte[] GetBuffer()
 		{
+			var mem = new MemoryWriter();
 			try
 			{
-				using (MemoryWriter mem = new MemoryWriter())
+				mem.Write(Polygons.Count);
+
+				for (int i = 0; i < Polygons.Count; i++)
 				{
-					mem.Write(Polygons.Count);
+					mem.Write(Polygons[i].Count);
 
-					for (int i = 0; i < Polygons.Count; i++)
+					for (int p = 0; p < Polygons[i].Count; p++)
 					{
-						mem.Write(Polygons[i].Count);
-
-						for (int p = 0; p < Polygons[i].Count; p++)
-						{
-							mem.Write(Polygons[i][p].X);
-							mem.Write(Polygons[i][p].Y);
-						}
+						mem.Write(Polygons[i][p].X);
+						mem.Write(Polygons[i][p].Y);
 					}
-
-					Parent.Log(Levels.Good, "Ok\n");
-					return mem.ToArray();
 				}
+
+				Parent.Log(Levels.Good, "Ok\n");
 			}
 			catch (Exception exception)
 			{
+				mem.Clear();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfa::GetBuffer<Exception> -> {exception}\n");
 			}
 
-			return null;
+			return mem.GetBuffer();
 		}
 
 		/// <summary>
@@ -121,9 +120,9 @@ namespace MapCore
 		/// <summary>
 		/// Refresh the current info for painting
 		/// </summary>
-		public void Refresh()
+		public void Render()
 		{
-			Painting?.Invoke(this, new EventArgs());
+			Rendering?.Invoke(this, new RenderArgs(Polygons, typeof(List<Polygon2>)));
 		}
 
 		/// <summary>
@@ -134,7 +133,22 @@ namespace MapCore
 		{
 			Polygons.RemoveAt(index);
 
-			Removed?.Invoke(this, new EventArgs());
+			Removed?.Invoke(this, new RemovedArgs(index, typeof(Nfa)));
+		}
+
+		/// <summary>
+		/// Update a region
+		/// </summary>
+		/// <param name="polygon"></param>
+		public void Update(Polygon2 polygon)
+		{
+			var data = Polygons.Find(r => r == polygon);
+			if (data != null)
+			{
+				data = polygon;
+			}
+
+			Updated?.Invoke(this, new UpdatedArgs(Polygons, typeof(List<Polygon2>)));
 		}
 	}
 }
