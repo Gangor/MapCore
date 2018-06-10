@@ -5,7 +5,7 @@ namespace MapCore.Events
 	/// <summary>
 	/// Adding event
 	/// </summary>
-	public class AddedArgs
+	public class AddedArgs : EventArgs
 	{
 		/// <summary>
 		/// Get or set object to send

@@ -6,8 +6,7 @@ namespace MapCore.Models
 	{		
 		public int QuestPropID { get; set; }
 		public ushort PropNum { get; set; }
-		public float X { get; set; }
-		public float Y { get; set; }
+		public Vector Position { get; set; } = new Vector();
 		public float OffSet { get; set; }
 		public float RotateX { get; set; }
 		public float RotateY { get; set; }

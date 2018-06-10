@@ -6,10 +6,7 @@ namespace MapCore.Models
 {
 	public class Respawn
 	{
-		public int Left { get; set; }
-		public int Top { get; set; }
-		public int Right { get; set; }
-		public int Bottom { get; set; }
+		public RectangleVector Rectangle { get; set; } = new RectangleVector();
 		public string Description { get; set; }
 		public List<string> Scripts { get; set; } = new List<string>();
 	}

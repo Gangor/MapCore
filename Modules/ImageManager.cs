@@ -10,27 +10,19 @@ namespace MapCore
 	/// <summary>
 	/// Manage the map picture
 	/// </summary>
-	public class ImageManager
+	public class ImageManager : IDisposable
 	{
-		/// <summary>
-		/// Get the pictures width
-		/// </summary>
-		public const int Width = 2048;
-
-		/// <summary>
-		/// Get the pictures height
-		/// </summary>
-		public const int Height = 2048;
+		private bool _disposed = false;
 
 		/// <summary>
 		/// Bitmap for cache blank map
 		/// </summary>
-		public Bitmap Cache = new Bitmap(Width, Height);
+		public Bitmap Cache = new Bitmap(Global.PictureLenght, Global.PictureLenght);
 
 		/// <summary>
 		/// Bitmap for draw all element
 		/// </summary>
-		public Bitmap Picture = new Bitmap(Width, Height);
+		public Bitmap Picture = new Bitmap(Global.PictureLenght, Global.PictureLenght);
 
 		/// <summary>
 		/// Manage bitmap for draw element
@@ -42,6 +34,7 @@ namespace MapCore
 		/// </summary>
 		public MapCore Parent;
 
+
 		#region Constructor
 
 		/// <summary>
@@ -52,6 +45,14 @@ namespace MapCore
 			graphic = Graphics.FromImage(Picture);
 			Parent = parent;
 			New();
+		}
+
+		/// <summary>
+		/// Destruct instance
+		/// </summary>
+		~ImageManager()
+		{
+			Dispose(true);
 		}
 
 		#endregion
@@ -245,8 +246,8 @@ namespace MapCore
 						prefix = "v256_";
 					}
 
-					partX = Width / partWidth;
-					partY = Height / partHeight;
+					partX = Global.PictureLenght / partWidth;
+					partY = Global.PictureLenght / partHeight;
 
 					g.Clear(Color.FromArgb(255, 120, 146, 173));
 
@@ -295,5 +296,35 @@ namespace MapCore
 				Parent.Log(Levels.Fatal, $"jpg::Load<Exception> -> {exception}\n");
 			}
 		}
+
+
+		#region Helper
+
+		/// <summary>
+		/// Dispose method
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Trigger dispose
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing && !_disposed)
+			{
+				Cache.Dispose();
+				Picture.Dispose();
+				graphic.Dispose();
+
+				_disposed = true;
+			}
+		}
+
+		#endregion
 	}
 }

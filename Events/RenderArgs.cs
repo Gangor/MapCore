@@ -5,7 +5,7 @@ namespace MapCore.Events
 	/// <summary>
 	/// Render event 
 	/// </summary>
-	public class RenderArgs
+	public class RenderArgs : EventArgs
 	{
 		/// <summary>
 		/// Get or set object to send

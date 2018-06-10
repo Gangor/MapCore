@@ -7,13 +7,10 @@ namespace MapCore.Models
 	public class Terrain
 	{
 		public string Sign { get; } = "nFlavor Map\0\0\0\0\0";
-		public int TileCountPerSegment { get; set; } = 6;
-		public int SegmentCountPerMap { get; set; } = 64;
-		public float TileLenght { get; set; } = 42.0f;
 		public TerrainProperties MapProperties { get; set; } = new TerrainProperties();
 		public TerrainSegment[,] DwTerrainSegment { get; set; } = new TerrainSegment[64, 64];
 		public List<TerrainProp> DwProps { get; set; } = new List<TerrainProp>();
-		public List<Grass> DwGrass { get; set; } = new List<Grass>();
+		public List<GrassProp> DwGrass { get; set; } = new List<GrassProp>();
 		public List<Polygon> DwVectorAttr { get; set; } = new List<Polygon>();
 		public List<Water> DwWater { get; set; } = new List<Water>();
 		public List<SpeedGrassColony> DwGrassColony { get; set; } = new List<SpeedGrassColony>();

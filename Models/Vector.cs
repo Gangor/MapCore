@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS1591
 
+using System;
 using System.Drawing;
 
 namespace MapCore.Models
@@ -23,6 +24,11 @@ namespace MapCore.Models
 		/// Get or set axe Z
 		/// </summary>
 		public float Z { get; set; }
+
+		/// <summary>
+		/// Create a new vector empty
+		/// </summary>
+		public static Vector Empty => new Vector();
 
 		/// <summary>
 		/// Construct a new point
@@ -61,7 +67,146 @@ namespace MapCore.Models
 			var hashCode = 1166230731;
 			hashCode = hashCode * -1521134295 + X.GetHashCode();
 			hashCode = hashCode * -1521134295 + Y.GetHashCode();
+			hashCode = hashCode * -1521134295 + Z.GetHashCode();
 			return hashCode;
+		}
+
+		/// <summary>
+		/// Get real coordonate
+		/// Be carefull, dont erase vector with this coordonnate
+		/// </summary>
+		public virtual Vector Clone()
+		{
+			return new Vector(X, Y, Z);
+		}
+
+		/// <summary>
+		/// Get game coordonate
+		/// </summary>
+		public virtual Vector GetGameCoordonate(int x, int y)
+		{
+			var vector = Clone();
+
+			vector.X = vector.X + Global.TerrainLenght * x;
+			vector.Y = vector.Y + Global.TerrainLenght * y;
+
+			return vector;
+		}
+
+		/// <summary>
+		/// Get current game X
+		/// </summary>
+		/// <param name="x"></param>
+		/// <returns></returns>
+		public virtual float GetGameX(int x)
+		{
+			return X + Global.TerrainLenght * x;
+		}
+
+		/// <summary>
+		/// Get current game Y
+		/// </summary>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		public virtual float GetGameY(int y)
+		{
+			return Y + Global.TerrainLenght * y;
+		}
+
+		/// <summary>
+		/// Get segment coordonate
+		/// </summary>
+		public virtual Vector GetSegmentCoordonate()
+		{
+			var vector = Clone();
+
+			vector.X = vector.X % (Global.TileLenght * Global.TileCountPerSegment);
+			vector.Y = vector.Y % (Global.TileLenght * Global.TileCountPerSegment);
+
+			return vector;
+		}
+
+		/// <summary>
+		/// Get current segment X
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetSegmentX()
+		{
+			return Math.Min((int)(X / (Global.TileLenght * Global.TileCountPerSegment)), Global.SegmentCountPerMap - 1);
+		}
+
+		/// <summary>
+		/// Get current segment Y
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetSegmentY()
+		{
+			return Math.Min((int)(Y / (Global.TileLenght * Global.TileCountPerSegment)), Global.SegmentCountPerMap - 1);
+		}
+
+		/// <summary>
+		/// Get segment id
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetSegmentId()
+		{
+			return GetSegmentX() + GetSegmentY() * Global.SegmentCountPerMap;
+		}
+
+		/// <summary>
+		/// Get real coordonate
+		/// Be carefull, dont erase vector with this coordonnate
+		/// </summary>
+		public virtual Vector GetTileCoordonate()
+		{
+			var vector = Clone();
+
+			vector.X = vector.X % (Global.TileLenght);
+			vector.Y = vector.Y % (Global.TileLenght);
+
+			return vector;
+		}
+
+		/// <summary>
+		/// Get current tile X
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetTileX()
+		{
+			return Math.Min((int)(X % (Global.TileLenght * Global.TileCountPerSegment) / Global.TileLenght), Global.TileCountPerSegment - 1);
+		}
+
+		/// <summary>
+		/// Get current tile Y
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetTileY()
+		{
+			return Math.Min((int)(Y % (Global.TileLenght * Global.TileCountPerSegment) / Global.TileLenght), Global.TileCountPerSegment - 1);
+		}
+
+		/// <summary>
+		/// Get tile id
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetTileId()
+		{
+			return GetTileX() + GetTileY() * Global.TileCountPerSegment;
+		}
+
+		/// <summary>
+		/// Get point with rotate 180 and flip Y
+		/// </summary>
+		/// <returns>Coordonate point</returns>
+		public Vector Rotate180FlipY()
+		{
+			var vector = Clone();
+
+			vector.X = Global.TerrainLenght - vector.X;
+			vector.Y = Global.TerrainLenght - vector.Y;
+			vector.X = Global.TerrainLenght - vector.X;
+
+			return vector;
 		}
 
 		public static bool operator ==(Vector left, Vector right)
@@ -112,38 +257,38 @@ namespace MapCore.Models
 
 		public static explicit operator Vector(Point obj)
 		{
-			var position = new Vector();
-			position.X = obj.X;
-			position.Y = obj.Y;
-
-			return position;
+			return new Vector
+			{
+				X = obj.X,
+				Y = obj.Y
+			};
 		}
 
-		public static explicit operator Vector(PointF obj)
+		public static explicit operator Vector(PointF point)
 		{
-			var position = new Vector();
-			position.X = obj.X;
-			position.Y = obj.Y;
-
-			return position;
+			return new Vector
+			{
+				X = point.X,
+				Y = point.Y
+			};
 		}
 
-		public static explicit operator Point(Vector obj)
+		public static explicit operator Point(Vector vector)
 		{
-			var position = new Point();
-			position.X = (int)obj.X;
-			position.Y = (int)obj.Y;
-
-			return position;
+			return new Point
+			{
+				X = (int)vector.X,
+				Y = (int)vector.Y
+			};
 		}
 
-		public static explicit operator PointF(Vector obj)
+		public static explicit operator PointF(Vector point)
 		{
-			var position = new PointF();
-			position.X = obj.X;
-			position.Y = obj.Y;
-
-			return position;
+			return new PointF
+			{
+				X = point.X,
+				Y = point.Y
+			};
 		}
 	}
 }

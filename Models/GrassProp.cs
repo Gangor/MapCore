@@ -4,8 +4,8 @@ namespace MapCore.Models
 {
 	public class GrassProp
 	{
-		public float X { get; set; }
-		public float Y { get; set; }
+		public int GrassId { get; set; }
+		public Vector Position { get; set; } = new Vector();
 		public float RotateX { get; set; }
 		public float RotateY { get; set; }
 		public float RotateZ { get; set; }

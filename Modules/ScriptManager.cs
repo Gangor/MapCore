@@ -3,7 +3,6 @@ using MapCore.Events;
 using MapCore.Models;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -82,13 +81,12 @@ namespace MapCore
 		/// <summary>
 		/// Add prop script
 		/// </summary>
-		/// <param name="point"></param>
-		public void AddNpc(PointF point)
+		/// <param name="vector"></param>
+		public void AddNpc(Vector vector)
 		{
 			var propScript = new NpcProp
 			{
-				X = point.X,
-				Y = point.Y
+				Position = vector
 			};
 			Props.Add(propScript);
 
@@ -100,14 +98,15 @@ namespace MapCore
 		/// </summary>
 		/// <param name="first"></param>
 		/// <param name="last"></param>
-		public void AddRespawn(PointF first, PointF last)
+		public void AddRespawn(Vector first, Vector last)
 		{
 			var location = new Respawn
 			{
-				Left = (int)first.X,
-				Top = (int)first.Y,
-				Right = (int)last.X,
-				Bottom = (int)last.Y
+				Rectangle = new RectangleVector()
+				{
+					LeftTop = first,
+					RightBottom = last
+				}
 			};
 			Respawns.Add(location);
 
@@ -146,10 +145,20 @@ namespace MapCore
 
 					for (int i = 0; i < Respawns.Count; i++)
 					{
-						mem.Write(Respawns[i].Left);
-						mem.Write(Respawns[i].Top);
-						mem.Write(Respawns[i].Right);
-						mem.Write(Respawns[i].Bottom);
+						var rectangle = Respawns[i].Rectangle.Clone();
+
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale / Global.TileLenght;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale / Global.TileLenght;
+						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
+
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale / Global.TileLenght;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale / Global.TileLenght;
+						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
+
+						mem.Write((int)rectangle.LeftTop.X);
+						mem.Write((int)rectangle.LeftTop.Y);
+						mem.Write((int)rectangle.RightBottom.X);
+						mem.Write((int)rectangle.RightBottom.Y);
 						mem.Write(Respawns[i].Description.Length);
 						mem.Write(Encoding.Default.GetBytes(Respawns[i].Description));
 					}
@@ -179,8 +188,15 @@ namespace MapCore
 					for (int i = 0; i < Props.Count; i++)
 					{
 						mem.Write(Props[i].PropId);
-						mem.Write(Props[i].X);
-						mem.Write(Props[i].Y);
+
+						var vector = Props[i].Position;
+
+						vector.X *= 7.875f;
+						vector.Y *= 7.875f;
+						vector = vector.Rotate180FlipY();
+
+						mem.Write(vector.X);
+						mem.Write(vector.Y);
 						mem.Write(Props[i].ModelId);
 						mem.Write(Props[i].Scripts.Count);
 
@@ -257,10 +273,21 @@ namespace MapCore
 					for (int i = 0; i < nLocationCount; i++)
 					{
 						var location = new Respawn();
-						location.Left = mem.ReadInt32();
-						location.Top = mem.ReadInt32();
-						location.Right = mem.ReadInt32();
-						location.Bottom = mem.ReadInt32();
+
+						location.Rectangle.LeftTop = new Vector
+						{
+							X = mem.ReadInt32() * Global.TileLenght / Global.Scale,
+							Y = mem.ReadInt32() * Global.TileLenght / Global.Scale
+						}
+						.Rotate180FlipY();
+
+						location.Rectangle.RightBottom = new Vector
+						{
+							X = mem.ReadInt32() * Global.TileLenght / Global.Scale,
+							Y = mem.ReadInt32() * Global.TileLenght / Global.Scale
+						}
+						.Rotate180FlipY();
+
 						var stringSize = mem.ReadInt32();
 						location.Description = Encoding.Default.GetString(mem.ReadBytes(stringSize));
 						Respawns.Add(location);
@@ -289,8 +316,14 @@ namespace MapCore
 					{
 						var propScript = new NpcProp();
 						propScript.PropId = mem.ReadInt32();
-						propScript.X = mem.ReadSingle();
-						propScript.Y = mem.ReadSingle();
+
+						var vector = new Vector
+						{
+							X = mem.ReadSingle() / 7.875f,
+							Y = mem.ReadSingle() / 7.875f
+						};
+
+						propScript.Position = vector.Rotate180FlipY();
 						propScript.ModelId = mem.ReadInt16();
 						var nFunctionCount = mem.ReadInt32();
 

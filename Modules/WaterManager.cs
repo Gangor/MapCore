@@ -61,13 +61,18 @@ namespace MapCore
 		/// </summary>
 		/// <param name="first"></param>
 		/// <param name="last"></param>
-		public void Add(PointF first, PointF last)
+		public void Add(Vector first, Vector last)
 		{
-			var water = new Water();
-
-			water.Points[0] = new Vector(first.X, first.Y);
-			water.Points[1] = new Vector(last.X, last.Y);
-			water.Points[2] = Utils.GetCenterPoint((Vector)first, (Vector)last);
+			var water = new Water
+			{
+				Rectangle = new RectangleVector
+				{
+					LeftTop = first,
+					RightBottom = last,
+					Center = Utils.GetCenterPoint(first, last),
+				}
+			};
+			
 			Waters.Add(water);
 
 			Added?.Invoke(this, new AddedArgs(water, typeof(Water)));
@@ -96,15 +101,29 @@ namespace MapCore
 
 					for (int i = 0; i < Waters.Count; i++)
 					{
-						mem.Write(Waters[i].Points[0].X);
-						mem.Write(Waters[i].Points[0].Y);
-						mem.Write(Waters[i].Points[0].Z);
-						mem.Write(Waters[i].Points[1].X);
-						mem.Write(Waters[i].Points[1].Y);
-						mem.Write(Waters[i].Points[1].Z);
-						mem.Write(Waters[i].Points[2].X);
-						mem.Write(Waters[i].Points[2].Y);
-						mem.Write(Waters[i].Points[2].Z);
+						var rectangle = Waters[i].Rectangle.Clone();
+
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale;
+						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
+
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale;
+						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
+
+						rectangle.Center.X = rectangle.Center.X * Global.Scale;
+						rectangle.Center.Y = rectangle.Center.Y * Global.Scale;
+						rectangle.Center = rectangle.RightBottom.Rotate180FlipY();
+
+						mem.Write((int)rectangle.LeftTop.X);
+						mem.Write((int)rectangle.LeftTop.Y);
+						mem.Write((int)rectangle.LeftTop.Z);
+						mem.Write((int)rectangle.RightBottom.X);
+						mem.Write((int)rectangle.RightBottom.Y);
+						mem.Write((int)rectangle.RightBottom.Z);
+						mem.Write((int)rectangle.Center.X);
+						mem.Write((int)rectangle.Center.Y);
+						mem.Write((int)rectangle.Center.Z);
 						mem.Write(Waters[i].UseReflect);
 						mem.Write(Waters[i].WaterId);
 					}
@@ -137,15 +156,31 @@ namespace MapCore
 					for (int i = 0; i < WaterCount; i++)
 					{
 						var water = new Water();
-						water.Points[0].X = mem.ReadSingle();
-						water.Points[0].Y = mem.ReadSingle();
-						water.Points[0].Z = mem.ReadSingle();
-						water.Points[1].X = mem.ReadSingle();
-						water.Points[1].Y = mem.ReadSingle();
-						water.Points[1].Z = mem.ReadSingle();
-						water.Points[2].X = mem.ReadSingle();
-						water.Points[2].Y = mem.ReadSingle();
-						water.Points[2].Z = mem.ReadSingle();
+
+						water.Rectangle.LeftTop = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
+						water.Rectangle.RightBottom = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
+						water.Rectangle.Center = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
 						water.UseReflect = mem.ReadInt32();
 						water.WaterId = mem.ReadInt32();
 						Waters.Add(water);

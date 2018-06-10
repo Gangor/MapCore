@@ -54,8 +54,11 @@
     <Compile Include="Events\RenderArgs.cs" />
     <Compile Include="Events\RemovedArgs.cs" />
     <Compile Include="Events\UpdatedArgs.cs" />
+    <Compile Include="Global.cs" />
     <Compile Include="MemoryWriter.cs" />
+    <Compile Include="Models\RectangleVector.cs" />
     <Compile Include="Models\Terrain.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Modules\ConfigManager.cs" />
     <Compile Include="MemoryReader.cs" />
@@ -72,7 +75,6 @@
     <Compile Include="Models\Light.cs" />
     <Compile Include="Models\GrassColony.cs" />
     <Compile Include="Models\TerrainLight.cs" />
-    <Compile Include="Models\Grass.cs" />
     <Compile Include="Models\GrassProp.cs" />
     <Compile Include="Models\TerrainProp.cs" />
     <Compile Include="Models\TerrainProperties.cs" />
@@ -101,9 +103,6 @@
       <Project>{f234efe9-3104-45fc-a5be-fdc3d0cd888e}</Project>
       <Name>DataCore</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

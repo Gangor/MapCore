@@ -18,6 +18,11 @@ namespace MapCore
 		public MapCore Parent;
 
 		/// <summary>
+		/// Get the ratio of the point
+		/// </summary>
+		public int PointRatio { get; } = 8;
+
+		/// <summary>
 		/// Get the terrain
 		/// </summary>
 		public Terrain Terrain = new Terrain();
@@ -40,18 +45,18 @@ namespace MapCore
 		/// </summary>
 		public void Blank()
 		{
-			Terrain.TileCountPerSegment = 6;
-			Terrain.SegmentCountPerMap = 64;
-			Terrain.TileLenght = 42;
+			Global.TileCountPerSegment = 6;
+			Global.SegmentCountPerMap = 64;
+			Global.TileLenght = 42;
 			Terrain.MapProperties = new TerrainProperties();
 			Terrain.DwTerrainSegment = new TerrainSegment[64, 64];
 
-			for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-				for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+			for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+				for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 				{
 					Terrain.DwTerrainSegment[segmentX, segmentY] = new TerrainSegment();
-					for (int titleY = 0; titleY < Terrain.TileCountPerSegment; titleY++)
-						for (int titleX = 0; titleX < Terrain.TileCountPerSegment; titleX++)
+					for (int titleY = 0; titleY < Global.TileCountPerSegment; titleY++)
+						for (int titleX = 0; titleX < Global.TileCountPerSegment; titleX++)
 						{
 							Terrain.DwTerrainSegment[segmentX, segmentY].HsVector[titleX, titleY] = new TerrainVertex();
 						}
@@ -86,9 +91,9 @@ namespace MapCore
 					mem.Write(0); /* dwGrassColonyOffset = */
 					mem.Write(0); /* dwEventAreaOffset = */
 
-					mem.Write(Terrain.TileCountPerSegment);
-					mem.Write(Terrain.SegmentCountPerMap);
-					mem.Write(Terrain.TileLenght);
+					mem.Write(Global.TileCountPerSegment);
+					mem.Write(Global.SegmentCountPerMap);
+					mem.Write(Global.TileLenght);
 
 					#region Properties
 
@@ -129,8 +134,8 @@ namespace MapCore
 
 					int dwTerrainSegmentOffset = (int)mem.Position;
 
-					for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-						for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+					for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+						for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 						{
 							mem.Write(Terrain.DwTerrainSegment[segmentX, segmentY].Version);
 
@@ -139,8 +144,8 @@ namespace MapCore
 								mem.Write(Terrain.DwTerrainSegment[segmentX, segmentY].Tile[tile]);
 							}
 
-							for (int titleY = 0; titleY < Terrain.TileCountPerSegment; titleY++)
-								for (int tileX = 0; tileX < Terrain.TileCountPerSegment; tileX++)
+							for (int titleY = 0; titleY < Global.TileCountPerSegment; titleY++)
+								for (int tileX = 0; tileX < Global.TileCountPerSegment; tileX++)
 								{
 									mem.Write(Terrain.DwTerrainSegment[segmentX, segmentY].HsVector[tileX, titleY].Height);
 
@@ -162,8 +167,8 @@ namespace MapCore
 
 					int dwPropOffset = (int)mem.Position;
 
-					for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-						for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+					for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+						for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 						{
 							mem.Write(0);
 						}
@@ -171,24 +176,29 @@ namespace MapCore
 					int index = 0;
 					int segment = 0;
 
-					for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-						for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+					for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+						for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 						{
 							var offset = (int)mem.Position;
 							mem.Seek(dwPropOffset + (4 * segment), SeekOrigin.Begin);
 							mem.Write(offset);
 							mem.Seek(offset, SeekOrigin.Begin);
 
-							var prop = Terrain.DwProps.Where(r => r.SegmentId == segment).ToList();
+							var prop = Terrain.DwProps.Where(r => r.Position.GetSegmentId() == segment).ToList();
 
 							mem.Write(prop.Count);
 
 							for (int p = 0; p < prop.Count; p++)
 							{
 								mem.Write(index);
-								mem.Write(prop[p].X);
-								mem.Write(prop[p].Y);
-								mem.Write(prop[p].Z);
+
+								var vector = prop[p].Position.Clone();
+
+								vector = vector.GetSegmentCoordonate();
+
+								mem.Write(vector.X);
+								mem.Write(vector.Y);
+								mem.Write(vector.Z);
 								mem.Write(prop[p].RotateX);
 								mem.Write(prop[p].RotateY);
 								mem.Write(prop[p].RotateZ);
@@ -202,22 +212,28 @@ namespace MapCore
 								index++;
 							}
 
-							var grass = Terrain.DwGrass.Where(r => r.SegmentId == segment).ToList();
+							var grass = Terrain.DwGrass.Where(r => r.Position.GetSegmentId() == segment)
+								.Select(u => u.GrassId)
+								.Distinct()
+								.ToList();
 
 							mem.Write(grass.Count);
 
 							for (int n = 0; n < grass.Count; n++)
 							{
-								mem.Write(grass[n].GrassId);
-								mem.Write(grass[n].Props.Count);
+								var props = Terrain.DwGrass.Where(r => r.Position.GetSegmentId() == segment && r.GrassId == grass[n])
+									.ToList();
 
-								for (int i = 0; i < grass[n].Props.Count; i++)
+								mem.Write(grass[n]);
+								mem.Write(props.Count);
+
+								for (int i = 0; i < props.Count; i++)
 								{
-									mem.Write(grass[n].Props[i].X);
-									mem.Write(grass[n].Props[i].Y);
-									mem.Write(grass[n].Props[i].RotateX);
-									mem.Write(grass[n].Props[i].RotateY);
-									mem.Write(grass[n].Props[i].RotateZ);
+									mem.Write(props[i].Position.X);
+									mem.Write(props[i].Position.Y);
+									mem.Write(props[i].RotateX);
+									mem.Write(props[i].RotateY);
+									mem.Write(props[i].RotateZ);
 								}
 							}
 
@@ -239,8 +255,14 @@ namespace MapCore
 
 						for (int p = 0; p < collisions[i].Count; p++)
 						{
-							mem.Write((int)collisions[i][p].X);
-							mem.Write((int)collisions[i][p].Y);
+							var vector = collisions[i][p].Clone();
+
+							vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
+							vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+							vector = vector.Rotate180FlipY();
+
+							mem.Write((int)vector.X);
+							mem.Write((int)vector.Y);
 						}
 					}
 
@@ -254,12 +276,30 @@ namespace MapCore
 
 					for (int i = 0; i < Terrain.DwWater.Count; i++)
 					{
-						foreach (var item in Terrain.DwWater[i].Points)
-						{
-							mem.Write(item.X);
-							mem.Write(item.Y);
-							mem.Write(item.Z);
-						}
+						var rectangle = Terrain.DwWater[i].Rectangle.Clone();
+
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale;
+						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
+
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale;
+						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
+
+						rectangle.Center.X = rectangle.Center.X * Global.Scale;
+						rectangle.Center.Y = rectangle.Center.Y * Global.Scale;
+						rectangle.Center = rectangle.RightBottom.Rotate180FlipY();
+
+						mem.Write((int)rectangle.LeftTop.X);
+						mem.Write((int)rectangle.LeftTop.Y);
+						mem.Write((int)rectangle.LeftTop.Z);
+						mem.Write((int)rectangle.RightBottom.X);
+						mem.Write((int)rectangle.RightBottom.Y);
+						mem.Write((int)rectangle.RightBottom.Z);
+						mem.Write((int)rectangle.Center.X);
+						mem.Write((int)rectangle.Center.Y);
+						mem.Write((int)rectangle.Center.Z);
+
 						mem.Write(Terrain.DwWater[i].UseReflect);
 						mem.Write(Terrain.DwWater[i].WaterId);
 					}
@@ -331,8 +371,14 @@ namespace MapCore
 
 							for (int n = 0; n < eventareas[i].Polygons[p].Count; n++)
 							{
-								mem.Write((int)eventareas[i].Polygons[p][n].X);
-								mem.Write((int)eventareas[i].Polygons[p][n].Y);
+								var vector = eventareas[i].Polygons[p][n].Clone();
+
+								vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
+								vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+								vector = vector.Rotate180FlipY();
+
+								mem.Write((int)vector.X);
+								mem.Write((int)vector.Y);
 							}
 						}
 					}
@@ -392,9 +438,9 @@ namespace MapCore
 					var dwGrassColonyOffset = (Terrain.Version >= 17) ? mem.ReadInt32() : 0;
 					var dwEventAreaOffset = (Terrain.Version >= 22) ? mem.ReadInt32() : 0;
 
-					Terrain.TileCountPerSegment = mem.ReadInt32();
-					Terrain.SegmentCountPerMap = mem.ReadInt32();
-					Terrain.TileLenght = mem.ReadSingle();
+					Global.TileCountPerSegment = mem.ReadInt32();
+					Global.SegmentCountPerMap = mem.ReadInt32();
+					Global.TileLenght = mem.ReadSingle();
 
 					#region Properties
 
@@ -419,8 +465,8 @@ namespace MapCore
 
 	#region Terrain segment
 
-					for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-						for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+					for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+						for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 						{
 							Terrain.DwTerrainSegment[segmentX, segmentY] = new TerrainSegment();
 							Terrain.DwTerrainSegment[segmentX, segmentY].Version = (Terrain.Version >= 16) ? mem.ReadUInt32() : 0;
@@ -430,10 +476,10 @@ namespace MapCore
 								Terrain.DwTerrainSegment[segmentX, segmentY].Tile[tile] = (Terrain.Version >= 16) ? mem.ReadUInt16() : (ushort)0;
 							}
 
-							Terrain.DwTerrainSegment[segmentX, segmentY].HsVector = new TerrainVertex[Terrain.TileCountPerSegment, Terrain.TileCountPerSegment];
+							Terrain.DwTerrainSegment[segmentX, segmentY].HsVector = new TerrainVertex[Global.TileCountPerSegment, Global.TileCountPerSegment];
 
-							for (int tileY = 0; tileY < Terrain.TileCountPerSegment; tileY++)
-								for (int tileX = 0; tileX < Terrain.TileCountPerSegment; tileX++)
+							for (int tileY = 0; tileY < Global.TileCountPerSegment; tileY++)
+								for (int tileX = 0; tileX < Global.TileCountPerSegment; tileX++)
 								{
 									Terrain.DwTerrainSegment[segmentX, segmentY].HsVector[tileX, tileY] = new TerrainVertex();
 									Terrain.DwTerrainSegment[segmentX, segmentY].HsVector[tileX, tileY].Height = mem.ReadSingle();
@@ -454,15 +500,15 @@ namespace MapCore
 	#region Prop
                     
 					//Escape offset prop table
-					for (int i = 0; i < Terrain.SegmentCountPerMap * Terrain.SegmentCountPerMap; i++)
+					for (int i = 0; i < Global.SegmentCountPerMap * Global.SegmentCountPerMap; i++)
 					{
 						mem.ReadInt32();
 					}
 
 					// PROP
 					var segment = 0;
-					for (int segmentY = 0; segmentY < Terrain.SegmentCountPerMap; segmentY++)
-						for (int segmentX = 0; segmentX < Terrain.SegmentCountPerMap; segmentX++)
+					for (int segmentY = 0; segmentY < Global.SegmentCountPerMap; segmentY++)
+						for (int segmentX = 0; segmentX < Global.SegmentCountPerMap; segmentX++)
 						{
 							var propcount = mem.ReadInt32();
 
@@ -470,10 +516,15 @@ namespace MapCore
 							{
 								var prop = new TerrainProp();
 								/* index */ mem.ReadInt32();
-								prop.SegmentId = segment;
-								prop.X = mem.ReadSingle();
-								prop.Y = mem.ReadSingle();
-								prop.Z = mem.ReadSingle();
+
+								var vector = new Vector
+								{
+									X = mem.ReadSingle() + (segmentX * Global.TileLenght * Global.TileCountPerSegment),
+									Y = mem.ReadSingle() + (segmentY * Global.TileLenght * Global.TileCountPerSegment),
+									Z = mem.ReadSingle()
+								};
+
+								prop.Position = vector;
 								prop.RotateX = mem.ReadSingle();
 								prop.RotateY = mem.ReadSingle();
 								prop.RotateZ = mem.ReadSingle();
@@ -493,23 +544,23 @@ namespace MapCore
 
 								for (int n = 0; n < grassCount; n++)
 								{
-									var grass = new Grass();
-									grass.SegmentId = segment;
-									grass.GrassId = mem.ReadInt32();
+									var grass = new GrassProp();
+									var grassId = mem.ReadInt32();
 									var propCount = mem.ReadInt32();
 
 									for (int i = 0; i < propCount; i++)
 									{
 										var prop = new GrassProp();
-										prop.X = mem.ReadSingle();
-										prop.Y = mem.ReadSingle();
+										var vector = new Vector(mem.ReadSingle(), mem.ReadSingle());
+
+										prop.GrassId = grassId;
+										prop.Position = vector;
 										prop.RotateX = mem.ReadSingle();
 										prop.RotateY = mem.ReadSingle();
 										prop.RotateZ = mem.ReadSingle();
-										grass.Props.Add(prop);
+										Terrain.DwGrass.Add(grass);
 									}
-
-									Terrain.DwGrass.Add(grass);
+									
 								}
 							}
 
@@ -545,22 +596,38 @@ namespace MapCore
 					for (int i = 0; i < waterCount; i++)
 					{
 						var water = new Water();
-						water.Points[0].X = mem.ReadSingle();
-						water.Points[0].Y = mem.ReadSingle();
-						water.Points[0].Z = mem.ReadSingle();
-						water.Points[1].X = mem.ReadSingle();
-						water.Points[1].Y = mem.ReadSingle();
-						water.Points[1].Z = mem.ReadSingle();
-						water.Points[2].X = mem.ReadSingle();
-						water.Points[2].Y = mem.ReadSingle();
-						water.Points[2].Z = mem.ReadSingle();
+
+						water.Rectangle.LeftTop = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
+						water.Rectangle.RightBottom = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
+						water.Rectangle.Center = new Vector
+						{
+							X = mem.ReadSingle() / Global.Scale,
+							Y = mem.ReadSingle() / Global.Scale,
+							Z = mem.ReadSingle()
+						}
+						.Rotate180FlipY();
+
 						water.UseReflect = mem.ReadInt32();
 						water.WaterId = mem.ReadInt32();
 						Terrain.DwWater.Add(water);
 					}
 
 					#endregion
-                    
+
 					if (Terrain.Version >= 17)
 					{
 	#region Speed grass
@@ -622,8 +689,12 @@ namespace MapCore
 
 								for (int n = 0; n < pointNum; n++)
 								{
-									var point = new Vector(mem.ReadInt32(), mem.ReadInt32());
-									polygon.Add(point);
+									var vector = new Vector
+									{
+										X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale,
+										Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale
+									};
+									polygon.Add(vector.Rotate180FlipY());
 								}
 
 								area.Polygons.Add(polygon);

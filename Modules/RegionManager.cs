@@ -123,8 +123,14 @@ namespace MapCore
 
 							for (int n = 0; n < Regions[i].Polygons[p].Count; n++)
 							{
-								mem.Write((int)Regions[i].Polygons[p][n].X);
-								mem.Write((int)Regions[i].Polygons[p][n].Y);
+								var vector = Regions[i].Polygons[p][n].Clone();
+
+								vector.X *= 7.875f;
+								vector.Y *= 7.875f;
+								vector = vector.Rotate180FlipY();
+
+								mem.Write((int)vector.X);
+								mem.Write((int)vector.Y);
 							}
 
 						}
@@ -177,8 +183,13 @@ namespace MapCore
 
 							for (int n = 0; n < pointNum; n++)
 							{
-								var point = new Vector(mem.ReadInt32(), mem.ReadInt32());
-								polygon.Add(point);
+								var vector = new Vector
+								{
+									X = mem.ReadInt32() / 7.875f,
+									Y = mem.ReadInt32() / 7.875f
+								};
+								
+								polygon.Add(vector.Rotate180FlipY());
 							}
 
 							region.Polygons.Add(polygon);

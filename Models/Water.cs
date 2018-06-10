@@ -8,7 +8,7 @@ namespace MapCore.Models
 	{
 		public int WaterId { get; set; }
 		public KColor Color { get; set; } = new KColor();
-		public Vector[] Points { get; set; } = new Vector[3];
+		public RectangleVector Rectangle { get; set; } = new RectangleVector();
 		public int UseReflect { get; set; }
 	}
 }

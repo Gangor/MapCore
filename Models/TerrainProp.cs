@@ -4,10 +4,7 @@ namespace MapCore.Models
 {
 	public class TerrainProp
 	{
-		public int SegmentId { get; set; }
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Z { get; set; }
+		public Vector Position { get; set; } = new Vector();
 		public float RotateX { get; set; }
 		public float RotateY { get; set; }
 		public float RotateZ { get; set; }

@@ -17,6 +17,11 @@ namespace MapCore
 		public MapCore Parent { get; }
 
 		/// <summary>
+		/// Get the ratio of the point
+		/// </summary>
+		public int PointRatio { get; } = 8;
+
+		/// <summary>
 		/// Get or set the list of all collision
 		/// </summary>
 		public List<Polygon> Polygons { get; set; } = new List<Polygon>();
@@ -91,8 +96,14 @@ namespace MapCore
 
 					for (int p = 0; p < Polygons[i].Count; p++)
 					{
-						mem.Write((int)Polygons[i][p].X);
-						mem.Write((int)Polygons[i][p].Y);
+						var vector = Polygons[i][p].Clone();
+
+						vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
+						vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+						vector = vector.Rotate180FlipY();
+
+						mem.Write((int)vector.X);
+						mem.Write((int)vector.Y);
 					}
 				}
 
@@ -127,8 +138,12 @@ namespace MapCore
 
 						for (int p = 0; p < pointNum; p++)
 						{
-							var point = new Vector(mem.ReadInt32(), mem.ReadInt32());
-							polygon.Add(point);
+							var vector = new Vector
+							{
+								X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale,
+								Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale
+							};
+							polygon.Add(vector.Rotate180FlipY());
 						}
 
 						Polygons.Add(polygon);

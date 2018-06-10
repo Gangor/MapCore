@@ -23,20 +23,26 @@ namespace MapCore
 		/// <summary>
 		/// Convertion coordonate to the point
 		/// </summary>
-		/// <param name="map">Map location</param>
 		/// <param name="point">Coordonate point</param>
 		/// <param name="zoom">Current zoom</param>
 		/// <param name="multiplicate">Need multiplication quotient</param>
 		/// <param name="divide">Need to divide tile size</param>
 		/// <returns>Game or Map point</returns>
-		public static Vector ConvertCoordonateToPoint(Point? map, Vector point, float zoom, bool divide, bool multiplicate)
+		public static Vector ConvertCoordonateToPoint(Vector point, float zoom, bool divide, bool multiplicate)
 		{
-			var position = GetPointRotate180FlipY(new Vector((point.X / zoom), (point.Y / zoom)));
-			if (map.HasValue)
+			var position = new Vector(point.X, point.Y, point.Z);
+
+			position.X %= mapLenght;
+			position.Y %= mapLenght;
+
+			if (zoom != 1)
 			{
-				position.X -= map.Value.X * 16128;
-				position.Y -= map.Value.Y * 16128;
+				position.X /= zoom;
+				position.Y /= zoom;
 			}
+
+			position = GetPointRotate180FlipY(position);
+
 			if (multiplicate)
 			{
 				position.X *= tileLenght;
@@ -65,20 +71,21 @@ namespace MapCore
 		/// </returns>
 		public static (int, Vector) ConvertCoordonateToSegmentPoint(Point? map, Vector point)
 		{
-			var pt = new Vector(point.X, point.Y);
+			var pt = point.Clone();
 
-			if (map.HasValue)
-			{
-				pt.X -= map.Value.X * 16128;
-				pt.Y -= map.Value.Y * 16128;
-			}
+			pt.X %= mapLenght;
+			pt.Y %= mapLenght;
 
-			int segmentX = Math.Min(((int)pt.X / tileLenght / 6), 63);
-			int segmentY = Math.Min(((int)pt.Y / tileLenght / 6), 63);
+			int segmentX = ((int)pt.X / (tileLenght * 6));
+			segmentX = (segmentX == 64) ? 63 : segmentX;
+
+			int segmentY = ((int)pt.Y / (tileLenght * 6));
+			segmentY = (segmentY == 64) ? 63 : segmentY;
+
 			int segmentNumber = segmentX + segmentY * 64;
 
-			pt.X = segmentNumber % 64 * tileLenght * 6;
-			pt.Y = segmentNumber / 64 * tileLenght * 6;
+			pt.X = point.X % (tileLenght * 6);
+			pt.Y = point.Y % (tileLenght * 6);
 
 			return (segmentNumber, pt);
 		}
@@ -86,17 +93,16 @@ namespace MapCore
 		/// <summary>
 		/// Convertion coordonates to the points
 		/// </summary>
-		/// <param name="map">Map location</param>
 		/// <param name="points">Coordonates points</param>
 		/// <param name="zoom">Current zoom</param>
-		/// <param name="divide">Need to divide tile size</param>
-		/// <param name="multiplicate">Need multiplication quotient</param>
+		/// <param name="hasFragmentation">Need to divide tile size</param>
+		/// <param name="hasTile">Need multiplication quotient</param>
 		/// <returns></returns>
-		public static Vector[] ConvertCoordonatesToPoints(Point? map, Vector[] points, float zoom, bool divide, bool multiplicate)
+		public static Vector[] ConvertCoordonatesToPoints(Vector[] points, float zoom, bool hasFragmentation, bool hasTile)
 		{
 			var data = new Vector[points.Length];
 			for (int i = 0; i < points.Length; i++)
-				data[i] = ConvertCoordonateToPoint(map, points[i], zoom, divide, multiplicate);
+				data[i] = ConvertCoordonateToPoint(points[i], zoom, hasFragmentation, hasTile);
 
 			return data;
 		}
@@ -107,21 +113,22 @@ namespace MapCore
 		/// <param name="map">Map location</param>
 		/// <param name="point">Map coordonate</param>
 		/// <param name="zoom">Current zoom</param>
-		/// <param name="multiplicate">Need multiplication quotient</param>
-		/// <param name="divide">Need to divide tile size</param>
+		/// <param name="hasFragmentation">Need multiplication quotient</param>
+		/// <param name="hasTile">Need to divide tile size</param>
 		/// <returns>Map or game coordonate point</returns>
-		public static Vector ConvertPointToCoordonate(Point? map, Vector point, float zoom, bool multiplicate, bool divide)
+		public static Vector ConvertPointToCoordonate(Point? map, Vector point, float zoom, bool hasFragmentation, bool hasTile)
 		{
 			var position = GetPointRotate180FlipY(new Vector((point.X / zoom), (point.Y / zoom)));
+
 			position.X *= 7.875f;
 			position.Y *= 7.875f;
 
-			if (multiplicate)
+			if (hasFragmentation)
 			{
 				position.X *= 8;
 				position.Y *= 8;
 			}
-			if (divide)
+			if (hasTile)
 			{
 				position.X /= tileLenght;
 				position.Y /= tileLenght;

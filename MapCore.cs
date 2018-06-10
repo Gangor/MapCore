@@ -1,9 +1,9 @@
 ﻿using DataCore;
 using MapCore.Enum;
 using MapCore.Events;
+using MapCore.Models;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,14 +16,9 @@ namespace MapCore
 	public class MapCore
 	{
 		/// <summary>
-		/// Get core instance
-		/// </summary>
-		public static MapCore Instance = null;
-
-		/// <summary>
 		/// Map coordonate x
 		/// </summary>
-		private Point Location = new Point();
+		public Vector Location { get; set; } = new Vector();
 
 		/// <summary>
 		/// Real name of the file
@@ -134,7 +129,7 @@ namespace MapCore
 		/// <summary>
 		/// Initialize a new instance
 		/// </summary>
-		protected MapCore(string folder)
+		public MapCore()
 		{
 			//
 			//Collision file
@@ -206,36 +201,6 @@ namespace MapCore
 			Plan = new ImageManager(this);
 		}
 
-		/// <summary>
-		/// Initialize singleton instance
-		/// </summary>
-		/// <returns></returns>
-		public static bool Init(string folder)
-		{
-			if (Instance == null)
-			{
-				Instance = new MapCore(folder);
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Destroy singleton instance
-		/// </summary>
-		/// <returns></returns>
-		public static bool DeInit()
-		{
-			if (Instance != null)
-			{
-				Instance = null;
-				return true;
-			}
-
-			return false;
-		}
-
 		#endregion
 
 		#region Etc
@@ -246,6 +211,7 @@ namespace MapCore
 		public void Dispose()
 		{
 			Reset?.Invoke(this, EventArgs.Empty);
+
 			Nfa.Blank();
 			Nfc.Blank();
 			Nfe.Blank();
@@ -296,7 +262,11 @@ namespace MapCore
 		/// m012_000(ascii)
 		/// </example>
 		/// <param name="name"></param>
-		/// <returns></returns>
+		/// <returns>
+		/// turple :
+		/// value1 = m012_000
+		/// value2 = (ascii)
+		/// </returns>
 		public static (string, string) ResolveEncode(string name)
 		{
 			var realname = name;

@@ -99,9 +99,15 @@ namespace MapCore
 
 							for (int t = 0; t < Records[i].Polygons[p].Count; t++)
 							{
-								mem.Write(Records[i].Polygons[p][t].X);
-								mem.Write(Records[i].Polygons[p][t].Y);
-								mem.Write(Records[i].Polygons[p][t].Z);
+								var vector = Records[i].Polygons[p][t].Clone();
+
+								vector.X *= 7.875f;
+								vector.Y *= 7.875f;
+								vector = vector.Rotate180FlipY();
+
+								mem.Write(vector.X);
+								mem.Write(vector.Y);
+								mem.Write(vector.Z);
 							}
 						}
 
@@ -151,8 +157,14 @@ namespace MapCore
 
 							for (int t = 0; t < pointNum; t++)
 							{
-								var point = new Vector(mem.ReadSingle(), mem.ReadSingle(), mem.ReadSingle());
-								polygon.Add(point);
+								var vector = new Vector
+								{
+									X = mem.ReadSingle() / 7.875f,
+									Y = mem.ReadSingle() / 7.875f,
+									Z = mem.ReadSingle()
+								};
+
+								polygon.Add(vector.Rotate180FlipY());
 							}
 
 							nfp.Polygons.Add(polygon);

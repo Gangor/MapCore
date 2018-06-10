@@ -76,13 +76,12 @@ namespace MapCore
 		/// <summary>
 		/// Add new prop
 		/// </summary>
-		/// <param name="point"></param>
-		public void Add(PointF point)
+		/// <param name="vector"></param>
+		public void Add(Vector vector)
 		{
 			var prop = new QuestProp
 			{
-				X = point.X,
-				Y = point.Y
+				Position = vector
 			};
 			Props.Add(prop);
 
@@ -115,8 +114,15 @@ namespace MapCore
 					for (int i = 0; i < Props.Count; i++)
 					{
 						mem.Write(Props[i].QuestPropID);
-						mem.Write(Props[i].X);
-						mem.Write(Props[i].Y);
+
+						var vector = Props[i].Position.Clone();
+
+						vector.X *= 7.875f;
+						vector.Y *= 7.875f;
+						vector = vector.Rotate180FlipY();
+
+						mem.Write(vector.X);
+						mem.Write(vector.Y);
 						mem.Write(Props[i].OffSet);
 						mem.Write(Props[i].RotateX);
 						mem.Write(Props[i].RotateY);
@@ -171,8 +177,14 @@ namespace MapCore
 					{
 						var prop = new QuestProp();
 						prop.QuestPropID = mem.ReadInt32();
-						prop.X = mem.ReadSingle();
-						prop.Y = mem.ReadSingle();
+
+						var vector = new Vector
+						{
+							X = mem.ReadSingle() / 7.875f,
+							Y = mem.ReadSingle() / 7.875f
+						};
+
+						prop.Position = vector.Rotate180FlipY();
 						prop.OffSet = mem.ReadSingle();
 						prop.RotateX = mem.ReadSingle();
 						prop.RotateY = mem.ReadSingle();

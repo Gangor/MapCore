@@ -131,9 +131,15 @@ namespace MapCore
 
 					for (int i = 0; i < Lights.Count; i++)
 					{
-						mem.Write(Lights[i].Position.X);
-						mem.Write(Lights[i].Position.Y);
-						mem.Write(Lights[i].Position.Z);
+						var vector = Lights[i].Position.Clone();
+
+						vector.X *= 7.875f;
+						vector.Y *= 7.875f;
+						vector = vector.Rotate180FlipY();
+
+						mem.Write(vector.X);
+						mem.Write(vector.Y);
+						mem.Write(vector.Z);
 						mem.Write(Lights[i].Height);
 						mem.Write(Lights[i].Direction.X);
 						mem.Write(Lights[i].Direction.Y);
@@ -188,9 +194,14 @@ namespace MapCore
 					for (int i = 0; i < lightCount; i++)
 					{
 						var light = new Light();
-						light.Position.X = mem.ReadSingle();
-						light.Position.Y = mem.ReadSingle();
-						light.Position.Z = mem.ReadSingle();
+						var vector = new Vector
+						{
+							X = mem.ReadSingle() / 7.875f,
+							Y = mem.ReadSingle() / 7.875f,
+							Z = mem.ReadSingle()
+						};
+
+						light.Position = vector.Rotate180FlipY();
 						light.Height = mem.ReadSingle();
 						light.Direction.X = mem.ReadSingle();
 						light.Direction.Y = mem.ReadSingle();
