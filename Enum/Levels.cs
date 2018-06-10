@@ -1,4 +1,6 @@
-﻿namespace MapCore.Enum
+﻿#pragma warning disable CS1591
+
+namespace MapCore.Enum
 {
 	public enum Levels
 	{

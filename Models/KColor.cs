@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿#pragma warning disable CS1591
+
+using System.Drawing;
 
 namespace MapCore.Models
 {

@@ -5,8 +5,19 @@ using System.Drawing;
 
 namespace MapCore
 {
+	/// <summary>
+	/// Utility for help manage 2D/3D coordonate
+	/// </summary>
 	public static class Utils
 	{
+		/// <summary>
+		/// Get the map lenght
+		/// </summary>
+		public const int mapLenght = 16128;
+
+		/// <summary>
+		/// Get the tile lenght
+		/// </summary>
 		public const int tileLenght = 42;
 
 		/// <summary>
@@ -15,26 +26,12 @@ namespace MapCore
 		/// <param name="map">Map location</param>
 		/// <param name="point">Coordonate point</param>
 		/// <param name="zoom">Current zoom</param>
-		/// <param name="divide">Need multiplication quotient</param>
-		/// <param name="multiplicate">Need to divide tile size</param>
+		/// <param name="multiplicate">Need multiplication quotient</param>
+		/// <param name="divide">Need to divide tile size</param>
 		/// <returns>Game or Map point</returns>
-		public static PointF ConvertCoordonateToPoint(Point? map, Point point, float zoom, bool divide, bool multiplicate)
+		public static Vector ConvertCoordonateToPoint(Point? map, Vector point, float zoom, bool divide, bool multiplicate)
 		{
-			var position = ConvertCoordonateToPoint(map, new PointF(point.X, point.Y), zoom, divide, multiplicate);
-			return new Point((int)position.X, (int)position.Y);
-		}
-
-		/// <summary>
-		/// Convertion coordonate to the point
-		/// </summary>
-		/// <param name="point"></param>
-		/// <param name="zoom"></param>
-		/// <param name="imprecision"></param>
-		/// <param name="tile"></param>
-		/// <returns>Game or Map point</returns>
-		public static PointF ConvertCoordonateToPoint(Point? map, PointF point, float zoom, bool divide, bool multiplicate)
-		{
-			var position = GetPointRotate180FlipY(new PointF((point.X / zoom), (point.Y / zoom)));
+			var position = GetPointRotate180FlipY(new Vector((point.X / zoom), (point.Y / zoom)));
 			if (map.HasValue)
 			{
 				position.X -= map.Value.X * 16128;
@@ -66,9 +63,9 @@ namespace MapCore
 		/// Segment number
 		/// Segment point
 		/// </returns>
-		public static (int, PointF) ConvertCoordonateToSegmentPoint(Point? map, PointF point)
+		public static (int, Vector) ConvertCoordonateToSegmentPoint(Point? map, Vector point)
 		{
-			var pt = new PointF(point.X, point.Y);
+			var pt = new Vector(point.X, point.Y);
 
 			if (map.HasValue)
 			{
@@ -89,34 +86,19 @@ namespace MapCore
 		/// <summary>
 		/// Convertion coordonates to the points
 		/// </summary>
-		/// <param name="map"></param>
-		/// <param name="points"></param>
-		/// <param name="zoom"></param>
-		/// <param name="divide"></param>
-		/// <param name="multiplicate"></param>
+		/// <param name="map">Map location</param>
+		/// <param name="points">Coordonates points</param>
+		/// <param name="zoom">Current zoom</param>
+		/// <param name="divide">Need to divide tile size</param>
+		/// <param name="multiplicate">Need multiplication quotient</param>
 		/// <returns></returns>
-		public static PointF[] ConvertCoordonatesToPoints(Point? map, PointF[] points, float zoom, bool divide, bool multiplicate)
+		public static Vector[] ConvertCoordonatesToPoints(Point? map, Vector[] points, float zoom, bool divide, bool multiplicate)
 		{
-			var data = new PointF[points.Length];
+			var data = new Vector[points.Length];
 			for (int i = 0; i < points.Length; i++)
 				data[i] = ConvertCoordonateToPoint(map, points[i], zoom, divide, multiplicate);
 
 			return data;
-		}
-
-		/// <summary>
-		/// Convertion point to the coordonate
-		/// </summary>
-		/// <param name="map">Map location</param>
-		/// <param name="point">Map coordonate point</param>
-		/// <param name="zoom">Current zoom</param>
-		/// <param name="multiplicate">Need multiplication quotient</param>
-		/// <param name="divide">Need to divide tile size</param>
-		/// <returns>Map or game coordonate point</returns>
-		public static Point ConvertPointToCoordonate(Point? map, Point point, float zoom, bool multiplicate, bool divide)
-		{
-			var position = ConvertPointToCoordonate(map, new PointF(point.X, point.Y), zoom, multiplicate, divide);
-			return new Point((int)position.X, (int)position.Y);
 		}
 
 		/// <summary>
@@ -128,9 +110,9 @@ namespace MapCore
 		/// <param name="multiplicate">Need multiplication quotient</param>
 		/// <param name="divide">Need to divide tile size</param>
 		/// <returns>Map or game coordonate point</returns>
-		public static PointF ConvertPointToCoordonate(Point? map, PointF point, float zoom, bool multiplicate, bool divide)
+		public static Vector ConvertPointToCoordonate(Point? map, Vector point, float zoom, bool multiplicate, bool divide)
 		{
-			var position = GetPointRotate180FlipY(new PointF((point.X / zoom), (point.Y / zoom)));
+			var position = GetPointRotate180FlipY(new Vector((point.X / zoom), (point.Y / zoom)));
 			position.X *= 7.875f;
 			position.Y *= 7.875f;
 
@@ -161,11 +143,11 @@ namespace MapCore
 		/// <param name="x">Segment coordonate x</param>
 		/// <param name="y">Segment coordonate y</param>
 		/// <returns>Map or game coordonate point</returns>
-		public static PointF ConvertSegmentPointToCoordonate(Point? map, int segmentNumber, float x, float y)
+		public static Vector ConvertSegmentPointToCoordonate(Point? map, int segmentNumber, float x, float y)
 		{
 			var segmentX = segmentNumber % 64 * tileLenght * 6;
 			var segmentY = segmentNumber / 64 * tileLenght * 6;
-			var point = new PointF((x + segmentX), (y + segmentY));
+			var point = new Vector((x + segmentX), (y + segmentY));
 
 			if (map.HasValue)
 			{
@@ -179,14 +161,15 @@ namespace MapCore
 		/// <summary>
 		/// Convertion points to the coordonnates
 		/// </summary>
+		/// <param name="map">Map location</param>
 		/// <param name="points">List of polygon need to be convert</param>
 		/// <param name="zoom">Actuel zoom</param>
 		/// <param name="multiplicate">Need multiplication quotient</param>
 		/// <param name="divide">Need to divide tile size</param>
 		/// <returns>Map or game coordonate points</returns>
-		public static PointF[] ConvertPointsToCoordonate(Point? map, PointF[] points, float zoom, bool multiplicate, bool divide)
+		public static Vector[] ConvertPointsToCoordonate(Point? map, Vector[] points, float zoom, bool multiplicate, bool divide)
 		{
-			var pts = (PointF[])points.Clone();
+			var pts = (Vector[])points.Clone();
 			for (var i = 0; i < pts.Length; i++)
 				pts[i] = ConvertPointToCoordonate(map, pts[i], zoom, multiplicate, divide);
 
@@ -199,11 +182,11 @@ namespace MapCore
 		/// <param name="pt1">First point</param>
 		/// <param name="pt2">Second point</param>
 		/// <returns>Center point</returns>
-		public static PointF GetCenterPoint(PointF pt1, PointF pt2)
+		public static Vector GetCenterPoint(Vector pt1, Vector pt2)
 		{
 			var centerX = (Math.Max(pt1.X, pt2.X) - Math.Min(pt1.X, pt2.X)) / 2 + Math.Min(pt1.X, pt2.X);
 			var centerY = (Math.Max(pt1.Y, pt2.Y) - Math.Min(pt1.Y, pt2.Y)) / 2 + Math.Min(pt1.Y, pt2.Y);
-			return new PointF(centerX, centerY);
+			return new Vector(centerX, centerY);
 		}
 
 		/// <summary>
@@ -211,21 +194,21 @@ namespace MapCore
 		/// </summary>
 		/// <returns>Center point of the point list</returns>
 		/// <returns></returns>
-		public static PointF GetCenterPolygon(List<PointF> points) { return GetCenterPolygon(points.ToArray()); }
+		public static Vector GetCenterPolygon(List<Vector> points) { return GetCenterPolygon(points.ToArray()); }
 
 		/// <summary>
 		/// Get the center point of the polygon
 		/// </summary>
 		/// <param name="polygon"></param>
 		/// <returns>Center point of the polygon</returns>
-		public static PointF GetCenterPolygon(Polygon2 polygon) { return GetCenterPolygon(polygon.ToPointArray()); }
+		public static Vector GetCenterPolygon(Polygon polygon) { return GetCenterPolygon(polygon.ToArray()); }
 
 		/// <summary>
 		/// Get the center point of the point array
 		/// </summary>
 		/// <param name="points">Coordonate point</param>
 		/// <returns>Center point of the polygon</returns>
-		public static PointF GetCenterPolygon(PointF[] points)
+		public static Vector GetCenterPolygon(Vector[] points)
 		{
 			var len = points.Length;
 			var pts = new PointF[len + 1];
@@ -254,7 +237,7 @@ namespace MapCore
 				centerX = -centerX;
 				centerY = -centerY;
 			}
-			return new PointF(centerX, centerY);
+			return new Vector(centerX, centerY);
 		}
 
 		/// <summary>
@@ -262,17 +245,16 @@ namespace MapCore
 		/// </summary>
 		/// <param name="points">Coordonate point</param>
 		/// <returns>Total surface</returns>
-		public static float GetPolygonArea(PointF[] points)
+		public static float GetPolygonArea(Vector[] points)
 		{
 			int len = points.Length;
 
 			float area = 0;
 			for (int i = 0; i < len; i++)
 			{
-				area +=
-					(points[(i + 1) % len].X - points[i].X) *
-					(points[(i + 1) % len].Y + points[i].Y) / 2;
+				area += (points[(i + 1) % len].X - points[i].X) * (points[(i + 1) % len].Y + points[i].Y) / 2;
 			}
+
 			return area;
 		}
 
@@ -281,12 +263,13 @@ namespace MapCore
 		/// </summary>
 		/// <param name="pointF">Coordonate point</param>
 		/// <returns>Coordonate point</returns>
-		public static PointF GetPointRotate180FlipY(PointF pointF)
+		public static Vector GetPointRotate180FlipY(Vector pointF)
 		{
-			var newPoint = new PointF(pointF.X, pointF.Y);
-			newPoint.X = ImageManager.Width - newPoint.X;
-			newPoint.Y = ImageManager.Height - newPoint.Y;
-			newPoint.X = ImageManager.Width - newPoint.X;
+			var newPoint = new Vector(pointF.X, pointF.Y);
+
+			newPoint.X = mapLenght - newPoint.X;
+			newPoint.Y = mapLenght - newPoint.Y;
+			newPoint.X = mapLenght - newPoint.X;
 
 			return newPoint;
 		}

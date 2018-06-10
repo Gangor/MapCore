@@ -31,8 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Release\MapCore.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -56,51 +55,46 @@
     <Compile Include="Events\RemovedArgs.cs" />
     <Compile Include="Events\UpdatedArgs.cs" />
     <Compile Include="MemoryWriter.cs" />
+    <Compile Include="Models\Terrain.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Cfg.cs" />
+    <Compile Include="Modules\ConfigManager.cs" />
     <Compile Include="MemoryReader.cs" />
     <Compile Include="Enum\Levels.cs" />
-    <Compile Include="Enum\LightType.cs" />
     <Compile Include="Events\LogArgs.cs" />
-    <Compile Include="Events\PaintingArgs.cs" />
-    <Compile Include="ImageManager.cs" />
-    <Compile Include="MapManager.cs" />
-    <Compile Include="Models\CFG\PropInfo.cs" />
-    <Compile Include="Models\CFG\TextureInfo.cs" />
-    <Compile Include="Models\K2DPosition.cs" />
-    <Compile Include="Models\K3DPosition.cs" />
+    <Compile Include="Modules\ImageManager.cs" />
+    <Compile Include="MapCore.cs" />
+    <Compile Include="Config\Prop.cs" />
+    <Compile Include="Config\Texture.cs" />
+    <Compile Include="Models\Vector.cs" />
     <Compile Include="Models\KColor.cs" />
-    <Compile Include="Models\NFC\LocationInfo.cs" />
-    <Compile Include="Models\NFE\EventAreaScript.cs" />
-    <Compile Include="Models\NFL\K3DVector.cs" />
-    <Compile Include="Models\NFL\StructLights.cs" />
-    <Compile Include="Models\NFM\GrassColony.cs" />
-    <Compile Include="Models\NFM\K3DLight.cs" />
-    <Compile Include="Models\NFM\KGrass.cs" />
-    <Compile Include="Models\NFM\KGrassProp.cs" />
-    <Compile Include="Models\NFM\KProp.cs" />
-    <Compile Include="Models\NFM\KProperties.cs" />
-    <Compile Include="Models\NFM\KSegment.cs" />
-    <Compile Include="Models\NFM\KVertex.cs" />
-    <Compile Include="Models\NFP\RecordNfp.cs" />
-    <Compile Include="Models\NFS\Location.cs" />
-    <Compile Include="Models\NFS\PropScriptInfo.cs" />
-    <Compile Include="Models\NFW\Water.cs" />
-    <Compile Include="Models\Polygon2.cs" />
-    <Compile Include="Models\Polygon3.cs" />
-    <Compile Include="Models\PVS\PVS_PROP_V1.cs" />
-    <Compile Include="Models\PVS\PVS_SEGMENT_V1.cs" />
-    <Compile Include="Models\QPF\Prop.cs" />
-    <Compile Include="Nfa.cs" />
-    <Compile Include="Nfc.cs" />
-    <Compile Include="Nfe.cs" />
-    <Compile Include="Nfl.cs" />
-    <Compile Include="Nfm.cs" />
-    <Compile Include="Nfp.cs" />
-    <Compile Include="Nfs.cs" />
-    <Compile Include="Nfw.cs" />
-    <Compile Include="Pvs.cs" />
-    <Compile Include="Qpf.cs" />
+    <Compile Include="Models\Region.cs" />
+    <Compile Include="Models\EventArea.cs" />
+    <Compile Include="Models\Light.cs" />
+    <Compile Include="Models\GrassColony.cs" />
+    <Compile Include="Models\TerrainLight.cs" />
+    <Compile Include="Models\Grass.cs" />
+    <Compile Include="Models\GrassProp.cs" />
+    <Compile Include="Models\TerrainProp.cs" />
+    <Compile Include="Models\TerrainProperties.cs" />
+    <Compile Include="Models\TerrainSegment.cs" />
+    <Compile Include="Models\TerrainVertex.cs" />
+    <Compile Include="Models\Unknow.cs" />
+    <Compile Include="Models\Respawn.cs" />
+    <Compile Include="Models\NpcProp.cs" />
+    <Compile Include="Models\Water.cs" />
+    <Compile Include="Models\Polygon.cs" />
+    <Compile Include="Models\Potencial.cs" />
+    <Compile Include="Models\QuestProp.cs" />
+    <Compile Include="Modules\CollisionManager.cs" />
+    <Compile Include="Modules\RegionManager.cs" />
+    <Compile Include="Modules\EventAreaManager.cs" />
+    <Compile Include="Modules\LightManager.cs" />
+    <Compile Include="Modules\TerrainManager.cs" />
+    <Compile Include="Modules\UnknowManager.cs" />
+    <Compile Include="Modules\ScriptManager.cs" />
+    <Compile Include="Modules\WaterManager.cs" />
+    <Compile Include="Modules\PotencialManager.cs" />
+    <Compile Include="Modules\QuestPropManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCore\DataCore.csproj">
@@ -111,6 +105,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
