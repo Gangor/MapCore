@@ -245,7 +245,7 @@ namespace MapCore
 					#region Vector attribute
 
 					var dwVectorAttrOffset = (int)mem.Position;
-					var collisions = Parent == null ? Terrain.DwVectorAttr : Parent.Nfa.Polygons;
+					var collisions = Parent == null ? Terrain.DwVectorAttr : Parent._collisionManager.Polygons;
 
 					mem.Write(collisions.Count);
 
@@ -257,8 +257,8 @@ namespace MapCore
 						{
 							var vector = collisions[i][p].Clone();
 
-							vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
-							vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+							vector.X = vector.X * Global.ScaleRatio * PointRatio / Global.TileLenght;
+							vector.Y = vector.Y * Global.ScaleRatio * PointRatio / Global.TileLenght;
 							vector = vector.Rotate180FlipY();
 
 							mem.Write((int)vector.X);
@@ -278,16 +278,16 @@ namespace MapCore
 					{
 						var rectangle = Terrain.DwWater[i].Rectangle.Clone();
 
-						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale;
-						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale;
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.ScaleRatio;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.ScaleRatio;
 						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
 
-						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale;
-						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale;
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.ScaleRatio;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.ScaleRatio;
 						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
 
-						rectangle.Center.X = rectangle.Center.X * Global.Scale;
-						rectangle.Center.Y = rectangle.Center.Y * Global.Scale;
+						rectangle.Center.X = rectangle.Center.X * Global.ScaleRatio;
+						rectangle.Center.Y = rectangle.Center.Y * Global.ScaleRatio;
 						rectangle.Center = rectangle.RightBottom.Rotate180FlipY();
 
 						mem.Write((int)rectangle.LeftTop.X);
@@ -356,7 +356,7 @@ namespace MapCore
 					#region Event area
 
 					int dwEventAreaOffset = (int)mem.Position;
-					var eventareas = Parent == null ? Terrain.DwEventArea : Parent.Nfe.Areas;
+					var eventareas = Parent == null ? Terrain.DwEventArea : Parent._eventAreaManager.Areas;
 
 					mem.Write(eventareas.Count);
 
@@ -373,8 +373,8 @@ namespace MapCore
 							{
 								var vector = eventareas[i].Polygons[p][n].Clone();
 
-								vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
-								vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+								vector.X = vector.X * Global.ScaleRatio * PointRatio / Global.TileLenght;
+								vector.Y = vector.Y * Global.ScaleRatio * PointRatio / Global.TileLenght;
 								vector = vector.Rotate180FlipY();
 
 								mem.Write((int)vector.X);
@@ -599,24 +599,24 @@ namespace MapCore
 
 						water.Rectangle.LeftTop = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.RightBottom = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.Center = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
@@ -691,8 +691,8 @@ namespace MapCore
 								{
 									var vector = new Vector
 									{
-										X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale,
-										Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale
+										X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.ScaleRatio,
+										Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.ScaleRatio
 									};
 									polygon.Add(vector.Rotate180FlipY());
 								}

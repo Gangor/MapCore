@@ -18,7 +18,7 @@
 		/// <summary>
 		/// Get or set the coordonate scale for conversion
 		/// </summary>
-		public static float Scale { get; } = 7.875f;
+		public static float ScaleRatio { get; } = 7.875f;
 
 		/// <summary>
 		/// Get or set the segment count

@@ -103,16 +103,16 @@ namespace MapCore
 					{
 						var rectangle = Waters[i].Rectangle.Clone();
 
-						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale;
-						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale;
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.ScaleRatio;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.ScaleRatio;
 						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
 
-						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale;
-						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale;
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.ScaleRatio;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.ScaleRatio;
 						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
 
-						rectangle.Center.X = rectangle.Center.X * Global.Scale;
-						rectangle.Center.Y = rectangle.Center.Y * Global.Scale;
+						rectangle.Center.X = rectangle.Center.X * Global.ScaleRatio;
+						rectangle.Center.Y = rectangle.Center.Y * Global.ScaleRatio;
 						rectangle.Center = rectangle.RightBottom.Rotate180FlipY();
 
 						mem.Write((int)rectangle.LeftTop.X);
@@ -159,24 +159,24 @@ namespace MapCore
 
 						water.Rectangle.LeftTop = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.RightBottom = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.Center = new Vector
 						{
-							X = mem.ReadSingle() / Global.Scale,
-							Y = mem.ReadSingle() / Global.Scale,
+							X = mem.ReadSingle() / Global.ScaleRatio,
+							Y = mem.ReadSingle() / Global.ScaleRatio,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();

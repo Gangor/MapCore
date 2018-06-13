@@ -107,8 +107,8 @@ namespace MapCore
 							{
 								var vector = Areas[i].Polygons[p][n].Clone();
 
-								vector.X = vector.X * Global.Scale * PointRatio / Global.TileLenght;
-								vector.Y = vector.Y * Global.Scale * PointRatio / Global.TileLenght;
+								vector.X = vector.X * Global.ScaleRatio * PointRatio / Global.TileLenght;
+								vector.Y = vector.Y * Global.ScaleRatio * PointRatio / Global.TileLenght;
 								vector = vector.Rotate180FlipY();
 
 								mem.Write((int)vector.X);
@@ -157,8 +157,8 @@ namespace MapCore
 							{
 								var vector = new Vector
 								{
-									X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale,
-									Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.Scale
+									X = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.ScaleRatio,
+									Y = mem.ReadInt32() * Global.TileLenght / PointRatio / Global.ScaleRatio
 								};
 								polygon.Add(vector.Rotate180FlipY());
 							}

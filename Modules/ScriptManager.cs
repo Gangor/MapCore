@@ -147,12 +147,12 @@ namespace MapCore
 					{
 						var rectangle = Respawns[i].Rectangle.Clone();
 
-						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.Scale / Global.TileLenght;
-						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.Scale / Global.TileLenght;
+						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.ScaleRatio / Global.TileLenght;
+						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.ScaleRatio / Global.TileLenght;
 						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
 
-						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.Scale / Global.TileLenght;
-						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.Scale / Global.TileLenght;
+						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.ScaleRatio / Global.TileLenght;
+						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.ScaleRatio / Global.TileLenght;
 						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
 
 						mem.Write((int)rectangle.LeftTop.X);
@@ -276,15 +276,15 @@ namespace MapCore
 
 						location.Rectangle.LeftTop = new Vector
 						{
-							X = mem.ReadInt32() * Global.TileLenght / Global.Scale,
-							Y = mem.ReadInt32() * Global.TileLenght / Global.Scale
+							X = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio,
+							Y = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio
 						}
 						.Rotate180FlipY();
 
 						location.Rectangle.RightBottom = new Vector
 						{
-							X = mem.ReadInt32() * Global.TileLenght / Global.Scale,
-							Y = mem.ReadInt32() * Global.TileLenght / Global.Scale
+							X = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio,
+							Y = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio
 						}
 						.Rotate180FlipY();
 
