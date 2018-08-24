@@ -54,7 +54,7 @@ namespace MapCore
 		/// </summary>
 		public RegionManager(MapCore module)
 		{
-			Blank();
+			Dispose();
 			Parent = module;
 		}
 
@@ -81,7 +81,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Regions = new List<Region>();
 			Render();
@@ -204,7 +204,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfc::Load<Exception> -> {exception}\n");
 			}

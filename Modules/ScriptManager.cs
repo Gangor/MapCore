@@ -74,7 +74,7 @@ namespace MapCore
 		/// </summary>
 		public ScriptManager(MapCore parent)
 		{
-			Blank();
+			Dispose();
 			Parent = parent;
 		}
 
@@ -116,7 +116,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Respawns.Clear();
 			Props.Clear();
@@ -344,7 +344,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfs::Load<Exception> -> {exception}\n");
 			}

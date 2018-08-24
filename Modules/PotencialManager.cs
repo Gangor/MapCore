@@ -82,14 +82,14 @@ namespace MapCore
 		/// </summary>
 		public PotencialManager(MapCore parent)
 		{
-			Blank();
+			Dispose();
 			Parent = parent;
 		}
 
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			SegmentCountPerMap = 64;
 			MapStartPosX = 0;
@@ -238,7 +238,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Pvs::Load<Exception> -> {exception}\n");
 			}

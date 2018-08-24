@@ -71,7 +71,7 @@ namespace MapCore
 		/// </summary>
 		public LightManager(MapCore parent)
 		{
-			Blank();
+			Dispose();
 			Parent = parent;
 		}
 
@@ -93,7 +93,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Specular = new KColor();
 			Diffuse = new KColor();
@@ -219,7 +219,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, string.Format("Nfl::Load<Exception> -> {0}\n", exception));
 			}

@@ -73,7 +73,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Polygons.Clear();
 			Render();
@@ -155,7 +155,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfa::Load<Exception> -> {exception}\n");
 			}

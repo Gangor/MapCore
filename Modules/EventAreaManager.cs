@@ -56,7 +56,7 @@ namespace MapCore
 		/// </summary>
 		public EventAreaManager(MapCore module)
 		{
-			Blank();
+			Dispose();
 			Parent = module;
 		}
 
@@ -76,7 +76,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Areas.Clear();
 			Render();
@@ -175,7 +175,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfe::Load<Exception> -> {exception}\n");
 			}

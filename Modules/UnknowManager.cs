@@ -52,7 +52,7 @@ namespace MapCore
 		/// </summary>
 		public UnknowManager(MapCore parent)
 		{
-			Blank();
+			Dispose();
 			Parent = parent;
 		}
 
@@ -70,7 +70,7 @@ namespace MapCore
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Records = new List<Unknow>();
 			Render();
@@ -182,7 +182,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfp::Load<Exception> -> {exception}\n");
 			}

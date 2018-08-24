@@ -36,14 +36,14 @@ namespace MapCore
 		/// Initialize a new instance
 		/// </summary>
 		public TerrainManager(MapCore module) {
-			Blank();
+			Dispose();
 			Parent = module;
 		}
 
 		/// <summary>
 		/// Reinitilize child objet
 		/// </summary>
-		public void Blank()
+		public void Dispose()
 		{
 			Global.TileCountPerSegment = 6;
 			Global.SegmentCountPerMap = 64;
@@ -711,7 +711,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Blank();
+				Dispose();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, $"Nfm::Load<Exception> -> {exception}\n");
 			}
