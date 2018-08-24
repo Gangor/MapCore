@@ -25,14 +25,25 @@ namespace MapCore
 		/// </summary>
 		public string Name => $"m{Location.X.ToString("000")}_{Location.Y.ToString("000")}";
 
+		/// <summary>
+		/// Get or set the file path
+		/// </summary>
+		public string Target;
+
+		/// <summary>
+		/// Get or set the origine of the file
+		/// </summary>
+		public DataSource Source { get; private set; } = DataSource.FILE;
+
 
 		#region Manager map file
 		#pragma warning disable CS1591
 
+		public readonly Core _core;
 		public readonly ConfigManager _configManager;
 		public readonly CollisionManager _collisionManager;
 		public readonly EventAreaManager _eventAreaManager;
-		public readonly ImageManager _imageManager;
+		public readonly CartographerManager _cartographerManager;
 		public readonly QuestPropManager _questPropManager;
 		public readonly LightManager _lightManager;
 		public readonly PotencialManager _potencialManager;
@@ -62,7 +73,7 @@ namespace MapCore
 		public event EventHandler<RenderArgs> Rendering;
 
 		/// <summary>
-		/// Event when load
+		/// Event when clear all objets
 		/// </summary>
 		public event EventHandler<EventArgs> Reset;
 
@@ -83,8 +94,12 @@ namespace MapCore
 		/// <summary>
 		/// Initialize a new instance
 		/// </summary>
-		public MapCore()
+		/// <param name="path">Path to the data.000</param>
+		public MapCore(string path)
 		{
+			// Core
+			//
+			_core = new Core();
 			//
 			//Collision file
 			//
@@ -152,7 +167,7 @@ namespace MapCore
 			//
 			//Map plan image
 			//
-			_imageManager = new ImageManager(this);
+			_cartographerManager = new CartographerManager(this);
 		}
 
 		#endregion
@@ -164,18 +179,18 @@ namespace MapCore
 		/// </summary>
 		public void Dispose()
 		{
-			Reset?.Invoke(this, EventArgs.Empty);
+			_collisionManager.Dispose();
+			_regionManager.Dispose();
+			_eventAreaManager.Dispose();
+			_lightManager.Dispose();
+			_terrainManager.Dispose();
+			_unknowManager.Dispose();
+			_scriptManager.Dispose();
+			_waterManager.Dispose();
+			_potencialManager.Dispose();
+			_questPropManager.Dispose();
 
-			_collisionManager.Blank();
-			_regionManager.Blank();
-			_eventAreaManager.Blank();
-			_lightManager.Blank();
-			_terrainManager.Blank();
-			_unknowManager.Blank();
-			_scriptManager.Blank();
-			_waterManager.Blank();
-			_potencialManager.Blank();
-			_questPropManager.Blank();
+			Reset?.Invoke(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -185,6 +200,7 @@ namespace MapCore
 		{
 			Dispose();
 			ResolveName(file);
+			SetSource(DataSource.FILE);
 
 			Log(Levels.Info, $"New project map {file}.\n");
 		}
@@ -242,38 +258,35 @@ namespace MapCore
 		/// <summary>
 		/// Saving all file from data
 		/// </summary>
-		/// <param name="core"></param>
-		/// <param name="folder"></param>
-		public void Export(Core core, string folder)
+		public void Export()
 		{
-			Log(Levels.Info, $"Saving map {Name} from DataCore v4...");
+			Log(Levels.Info, $"Export map {Name} with DataCore...");
 
-			Export(core, $"{Name}.nfa", new Func<byte[]>(_collisionManager.GetBuffer));
-			Export(core, $"{Name}.nfc", new Func<byte[]>(_regionManager.GetBuffer));
-			Export(core, $"{Name}.nfe", new Func<byte[]>(_eventAreaManager.GetBuffer));
-			Export(core, $"{Name}.nfl", new Func<byte[]>(_lightManager.GetBuffer));
-			Export(core, $"{Name}.nfm", new Func<byte[]>(_terrainManager.GetBuffer));
-			Export(core, $"{Name}.nfp", new Func<byte[]>(_unknowManager.GetBuffer));
-			Export(core, $"{Name}.nfs", new Func<byte[]>(_scriptManager.GetBuffer));
-			Export(core, $"{Name}.nfw", new Func<byte[]>(_waterManager.GetBuffer));
-			Export(core, $"{Name}.pvs", new Func<byte[]>(_potencialManager.GetBuffer));
-			Export(core, $"{Name}.qpf", new Func<byte[]>(_questPropManager.GetBuffer));
-			core.Save(folder);
+			Export($"{Name}.nfa", _collisionManager.GetBuffer);
+			Export($"{Name}.nfc", _regionManager.GetBuffer);
+			Export($"{Name}.nfe", _eventAreaManager.GetBuffer);
+			Export($"{Name}.nfl", _lightManager.GetBuffer);
+			Export($"{Name}.nfm", _terrainManager.GetBuffer);
+			Export($"{Name}.nfp", _unknowManager.GetBuffer);
+			Export($"{Name}.nfs", _scriptManager.GetBuffer);
+			Export($"{Name}.nfw", _waterManager.GetBuffer);
+			Export($"{Name}.pvs", _potencialManager.GetBuffer);
+			Export($"{Name}.qpf", _questPropManager.GetBuffer);
 
-			Log(Levels.Info, "Map saving completed.");
+			_core.Save();
+
+			Log(Levels.Info, "Map export completed.");
 		}
 
 		/// <summary>
 		/// Export file one by one from data
 		/// </summary>
-		/// <param name="core"></param>
 		/// <param name="filename"></param>
 		/// <param name="action"></param>
-		private void Export(Core core, string filename, Func<byte[]> action)
+		private void Export(string filename, Func<byte[]> action)
 		{
-			Log(Levels.Info, $"Saving {filename}...\t");
-
-			core.ImportFileEntry(filename, action());
+			Log(Levels.Info, $"Exporting {filename}...\t");
+			_core.ImportFileEntry(filename, action());
 		}
 
 		#endregion
@@ -283,49 +296,53 @@ namespace MapCore
 		/// <summary>
 		/// Load a existing project map by data
 		/// </summary>
-		/// <param name="core"></param>
+		/// <param name="directory">Directory to the data.000</param>
 		/// <param name="file"></param>
 		/// <param name="encoding"></param>
-		public void Import(Core core, string file, string encoding)
+		public void Import(string directory, string file, string encoding)
 		{
 			Dispose();
 			ResolveName(file);
+			SetSource(DataSource.CORE);
 
-			Log(Levels.Info, $"Loading map {file} from DataCore v4...");
+			Log(Levels.Info, $"Import map {file} with DataCore...");
 
-			Import(core, $"terrainpropinfo{encoding}.cfg", new Action<byte[]>(_configManager.LoadProp));
-			Import(core, $"terraintextureinfo{encoding}.cfg", new Action<byte[]>(_configManager.LoadTexture));
-			Import(core, $"{file}{encoding}.nfa", new Action<byte[]>(_collisionManager.Load));
-			Import(core, $"{file}{encoding}.nfc", new Action<byte[]>(_regionManager.Load));
-			Import(core, $"{file}{encoding}.nfe", new Action<byte[]>(_eventAreaManager.Load));
-			Import(core, $"{file}{encoding}.nfl", new Action<byte[]>(_lightManager.Load));
-			Import(core, $"{file}{encoding}.nfm", new Action<byte[]>(_terrainManager.Load));
-			Import(core, $"{file}{encoding}.nfp", new Action<byte[]>(_unknowManager.Load));
-			Import(core, $"{file}{encoding}.nfs", new Action<byte[]>(_scriptManager.Load));
-			Import(core, $"{file}{encoding}.nfw", new Action<byte[]>(_waterManager.Load));
-			Import(core, $"{file}{encoding}.pvs", new Action<byte[]>(_potencialManager.Load));
-			Import(core, $"{file}{encoding}.qpf", new Action<byte[]>(_questPropManager.Load));
+			_core.Load(directory);
 
-			Log(Levels.Info, "Map loading completed.");
+			Import($"terrainpropinfo{encoding}.cfg", _configManager.LoadProp);
+			Import($"terraintextureinfo{encoding}.cfg", _configManager.LoadTexture);
+			Import($"{file}{encoding}.nfa", _collisionManager.Load);
+			Import($"{file}{encoding}.nfc", _regionManager.Load);
+			Import($"{file}{encoding}.nfe", _eventAreaManager.Load);
+			Import($"{file}{encoding}.nfl", _lightManager.Load);
+			Import($"{file}{encoding}.nfm", _terrainManager.Load);
+			Import($"{file}{encoding}.nfp", _unknowManager.Load);
+			Import($"{file}{encoding}.nfs", _scriptManager.Load);
+			Import($"{file}{encoding}.nfw", _waterManager.Load);
+			Import($"{file}{encoding}.pvs", _potencialManager.Load);
+			Import($"{file}{encoding}.qpf", _questPropManager.Load);
+
+			_cartographerManager.Load(_core, directory, file, encoding);
+
+			Log(Levels.Info, "Import loading completed.");
 		}
 
 		/// <summary>
 		/// Load file one by one by data
 		/// </summary>
-		/// <param name="core"></param>
 		/// <param name="filename"></param>
 		/// <param name="action"></param>
-		private void Import(Core core, string filename, Action<byte[]> action)
+		private void Import(string filename, Action<byte[]> action)
 		{
-			Log(Levels.Info, $"Loading {filename}...\t");
+			Log(Levels.Info, $"Importing {filename}...\t");
 
-			if (!core.GetEntryExists(filename))
+			if (!_core.GetEntryExists(filename))
 			{
 				Log(Levels.Warning, "Introuvable");
 				return;
 			}
 
-			action(core.GetFileBytes(filename));
+			action(_core.GetFileBytes(filename));
 		}
 
 		#endregion
@@ -342,21 +359,25 @@ namespace MapCore
 		{
 			Dispose();
 			ResolveName(file);
+			SetPath(folder);
+			SetSource(DataSource.FILE);
 
 			Log(Levels.Info, $"Loading map {file} from path {folder}...");
 			
-			Load(folder + @"\cfg", $"terrainpropinfo{encoding}.cfg", new Action<byte[]>(_configManager.LoadProp));
-			Load(folder + @"\cfg", $"terraintextureinfo{encoding}.cfg", new Action<byte[]>(_configManager.LoadTexture));
-			Load(folder + @"\nfa\", $"{file}{encoding}.nfa", new Action<byte[]>(_collisionManager.Load));
-			Load(folder + @"\nfc\", $"{file}{encoding}.nfc", new Action<byte[]>(_regionManager.Load));
-			Load(folder + @"\nfe\", $"{file}{encoding}.nfe", new Action<byte[]>(_eventAreaManager.Load));
-			Load(folder + @"\nfl\", $"{file}{encoding}.nfl", new Action<byte[]>(_lightManager.Load));
-			Load(folder + @"\nfm\", $"{file}{encoding}.nfm", new Action<byte[]>(_terrainManager.Load));
-			Load(folder + @"\nfp\", $"{file}{encoding}.nfp", new Action<byte[]>(_unknowManager.Load));
-			Load(folder + @"\nfs\", $"{file}{encoding}.nfs", new Action<byte[]>(_scriptManager.Load));
-			Load(folder + @"\nfw\", $"{file}{encoding}.nfw", new Action<byte[]>(_waterManager.Load));
-			Load(folder + @"\pvs\", $"{file}{encoding}.pvs", new Action<byte[]>(_potencialManager.Load));
-			Load(folder + @"\qpf\", $"{file}{encoding}.qpf", new Action<byte[]>(_questPropManager.Load));
+			Load(folder + @"\cfg", $"terrainpropinfo{encoding}.cfg", _configManager.LoadProp);
+			Load(folder + @"\cfg", $"terraintextureinfo{encoding}.cfg", _configManager.LoadTexture);
+			Load(folder + @"\nfa\", $"{file}{encoding}.nfa", _collisionManager.Load);
+			Load(folder + @"\nfc\", $"{file}{encoding}.nfc", _regionManager.Load);
+			Load(folder + @"\nfe\", $"{file}{encoding}.nfe", _eventAreaManager.Load);
+			Load(folder + @"\nfl\", $"{file}{encoding}.nfl", _lightManager.Load);
+			Load(folder + @"\nfm\", $"{file}{encoding}.nfm", _terrainManager.Load);
+			Load(folder + @"\nfp\", $"{file}{encoding}.nfp", _unknowManager.Load);
+			Load(folder + @"\nfs\", $"{file}{encoding}.nfs", _scriptManager.Load);
+			Load(folder + @"\nfw\", $"{file}{encoding}.nfw", _waterManager.Load);
+			Load(folder + @"\pvs\", $"{file}{encoding}.pvs", _potencialManager.Load);
+			Load(folder + @"\qpf\", $"{file}{encoding}.qpf", _questPropManager.Load);
+
+			_cartographerManager.Load(folder, file, encoding);
 
 			Log(Levels.Info, "Map loading completed.");
 		}
@@ -387,23 +408,35 @@ namespace MapCore
 		#region Save
 
 		/// <summary>
+		/// Save file with the source of data
+		/// </summary>
+		public void Save()
+		{
+			switch (Source)
+			{
+				case DataSource.FILE: Save(Target);		break;
+				case DataSource.CORE: Export();			break;
+			}
+		}
+
+		/// <summary>
 		/// Save all file
 		/// </summary>
 		/// <param name="folder"></param>
 		public void Save(string folder)
 		{
-			Log(Levels.Info, "Saving map {filename} on path {folder}...");
+			Log(Levels.Info, $"Saving map {Name} on path {folder}...");
 
-			Save(folder + @"\nfa\", $"{Name}.nfa", new Func<byte[]>(_collisionManager.GetBuffer));
-			Save(folder + @"\nfc\", $"{Name}.nfc", new Func<byte[]>(_regionManager.GetBuffer));
-			Save(folder + @"\nfe\", $"{Name}.nfe", new Func<byte[]>(_eventAreaManager.GetBuffer));
-			Save(folder + @"\nfl\", $"{Name}.nfl", new Func<byte[]>(_lightManager.GetBuffer));
-			Save(folder + @"\nfm\", $"{Name}.nfm", new Func<byte[]>(_terrainManager.GetBuffer));
-			Save(folder + @"\nfp\", $"{Name}.nfp", new Func<byte[]>(_unknowManager.GetBuffer));
-			Save(folder + @"\nfs\", $"{Name}.nfs", new Func<byte[]>(_scriptManager.GetBuffer));
-			Save(folder + @"\nfw\", $"{Name}.nfw", new Func<byte[]>(_waterManager.GetBuffer));
-			Save(folder + @"\pvs\", $"{Name}.pvs", new Func<byte[]>(_potencialManager.GetBuffer));
-			Save(folder + @"\qpf\", $"{Name}.qpf", new Func<byte[]>(_questPropManager.GetBuffer));
+			Save(folder + @"\nfa\", $"{Name}.nfa", _collisionManager.GetBuffer);
+			Save(folder + @"\nfc\", $"{Name}.nfc", _regionManager.GetBuffer);
+			Save(folder + @"\nfe\", $"{Name}.nfe", _eventAreaManager.GetBuffer);
+			Save(folder + @"\nfl\", $"{Name}.nfl", _lightManager.GetBuffer);
+			Save(folder + @"\nfm\", $"{Name}.nfm", _terrainManager.GetBuffer);
+			Save(folder + @"\nfp\", $"{Name}.nfp", _unknowManager.GetBuffer);
+			Save(folder + @"\nfs\", $"{Name}.nfs", _scriptManager.GetBuffer);
+			Save(folder + @"\nfw\", $"{Name}.nfw", _waterManager.GetBuffer);
+			Save(folder + @"\pvs\", $"{Name}.pvs", _potencialManager.GetBuffer);
+			Save(folder + @"\qpf\", $"{Name}.qpf", _questPropManager.GetBuffer);
 
 			Log(Levels.Info, "Map saving completed.");
 		}
@@ -432,49 +465,55 @@ namespace MapCore
 		#region Watch
 
 		/// <summary>
-		/// Watch directory for retrieves all file
+		/// Watch from data for retieves all file
+		/// </summary>
+		/// <returns></returns>
+		public List<string> Watch()
+		{
+			var mapping = new List<string>();
+
+			if (_core.RowCount != 0)
+			{
+				var names = _core.GetEntriesByExtension("nfs")
+								.Select(u => Path.GetFileNameWithoutExtension(u.Name).ToLower());
+
+				foreach (var name in names.Distinct())
+				{
+					var match = Regex.Match(name, @"\bm([0-9]+)_([0-9]+)");
+					if (match.Success)
+					{
+						mapping.Add(name);
+					}
+				}
+			}
+
+			return mapping.OrderBy(r => r).ToList();
+		}
+
+		/// <summary>
+		/// Watch from directory for retrieves all file
 		/// </summary>
 		/// <param name="path"></param>
-		public static List<string> Watch(string path)
+		public List<string> Watch(string path)
 		{
 			var mapping = new List<string>();
 			var directory = Path.Combine(path, "nfs");
 
 			if (Directory.Exists(directory))
 			{
-				var files = Directory.GetFiles(directory, "*.nfs", SearchOption.AllDirectories);
-				foreach (var file in files)
+				var names = Directory.GetFiles(directory, "*.nfs", SearchOption.AllDirectories)
+								.Select(u => Path.GetFileNameWithoutExtension(u).ToLower());
+
+				foreach (var name in names.Distinct())
 				{
-					var name = Path.GetFileNameWithoutExtension(file);
 					var match = Regex.Match(name, @"\bm([0-9]+)_([0-9]+)");
 					if (match.Success)
 					{
-						if (!mapping.Contains(name)) mapping.Add(name);
+						mapping.Add(name);
 					}
 				}
 			}
-			return mapping.OrderBy(r => r).ToList();
-		}
 
-		/// <summary>
-		/// Watch data for retieves all file
-		/// </summary>
-		/// <param name="core"></param>
-		/// <returns></returns>
-		public static List<string> Watch(Core core)
-		{
-			var mapping = new List<string>();
-			var entries = core.GetEntriesByExtension("nfs");
-
-			foreach (var file in entries)
-			{
-				var name = Path.GetFileNameWithoutExtension(file.Name);
-				var match = Regex.Match(name, @"\bm([0-9]+)_([0-9]+)");
-				if (match.Success)
-				{
-					if (!mapping.Contains(name)) mapping.Add(name);
-				}
-			}
 			return mapping.OrderBy(r => r).ToList();
 		}
 
@@ -492,6 +531,24 @@ namespace MapCore
 			#if DEBUG == true
 				Console.Write(message);
 			#endif
+		}
+
+		/// <summary>
+		/// Change the directory target
+		/// </summary>
+		/// <param name="path"></param>
+		private void SetPath(string path)
+		{
+			Target = path;
+		}
+
+		/// <summary>
+		/// Change the origin of the file
+		/// </summary>
+		/// <param name="source"></param>
+		private void SetSource(DataSource source)
+		{
+			Source = source;
 		}
 	}
 }

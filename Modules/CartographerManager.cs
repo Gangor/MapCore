@@ -10,7 +10,7 @@ namespace MapCore
 	/// <summary>
 	/// Manage the map picture
 	/// </summary>
-	public class ImageManager : IDisposable
+	public class CartographerManager : IDisposable
 	{
 		private bool _disposed = false;
 
@@ -40,7 +40,7 @@ namespace MapCore
 		/// <summary>
 		/// Initialize a new instance
 		/// </summary>
-		public ImageManager(MapCore parent)
+		public CartographerManager(MapCore parent)
 		{
 			graphic = Graphics.FromImage(Picture);
 			Parent = parent;
@@ -50,7 +50,7 @@ namespace MapCore
 		/// <summary>
 		/// Destruct instance
 		/// </summary>
-		~ImageManager()
+		~CartographerManager()
 		{
 			Dispose(true);
 		}
