@@ -6,6 +6,11 @@
 	public class Global
 	{
 		/// <summary>
+		/// Get or set the map lenght
+		/// </summary>
+		public static int Lenght { get; } = 16128;
+
+		/// <summary>
 		/// Get or set the picture lenght
 		/// </summary>
 		public static int PictureLenght { get; } = 2048;
