@@ -6,8 +6,8 @@ namespace MapCore.Enum
 	{
 		Trace,
 		Debug,
-		Good,
 		Info,
+		Success,
 		Warning,
 		Error,
 		Fatal,

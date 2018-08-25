@@ -282,7 +282,7 @@ namespace MapCore
 					Cache.RotateFlip(RotateFlipType.Rotate180FlipX);
 					DrawCache();
 
-					if (error == 0)		Parent.Log(Levels.Good, "Ok\n");
+					if (error == 0)		Parent.Log(Levels.Success, "Ok\n");
 					else if (load > 0)	Parent.Log(Levels.Warning, $"Ok (Partial count : {load}/{partX * partX})\n");
 					else				Parent.Log(Levels.Error, "Failed\n");
 				}

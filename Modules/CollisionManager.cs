@@ -107,7 +107,7 @@ namespace MapCore
 					}
 				}
 
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{
@@ -151,7 +151,7 @@ namespace MapCore
 				}
 
 				Render();
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{

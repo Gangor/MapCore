@@ -150,7 +150,7 @@ namespace MapCore
 						}
 					}
 
-					Parent.Log(Levels.Good, "Ok\n");
+					Parent.Log(Levels.Success, "Ok\n");
 					return mem.ToArray();
 				}
 			}
@@ -234,7 +234,7 @@ namespace MapCore
 					}
 				}
 				
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{

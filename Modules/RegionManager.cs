@@ -64,7 +64,7 @@ namespace MapCore
 		/// <param name="points"></param>
 		public void Add(PointF[] points)
 		{
-			var center = Utils.GetCenterPolygon(points);
+			var center = ((Polygon)points).GetCenterPoint();
 			var region = new Region
 			{
 				X = center.X,
@@ -136,7 +136,7 @@ namespace MapCore
 						}
 					}
 
-					Parent.Log(Levels.Good, "Ok\n");
+					Parent.Log(Levels.Success, "Ok\n");
 					return mem.ToArray();
 				}
 			}
@@ -200,7 +200,7 @@ namespace MapCore
 				}
 
 				Render();
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{

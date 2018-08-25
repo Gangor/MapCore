@@ -119,7 +119,7 @@ namespace MapCore
 						mem.Write(Encoding.Default.GetBytes(description));
 					}
 
-					Parent.Log(Levels.Good, "Ok\n");
+					Parent.Log(Levels.Success, "Ok\n");
 					return mem.ToArray();
 				}
 			}
@@ -178,7 +178,7 @@ namespace MapCore
 				}
 
 				Render();
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{

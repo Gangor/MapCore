@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enum\DataSource.cs" />
     <Compile Include="Events\AddedArgs.cs" />
     <Compile Include="Events\RenderArgs.cs" />
     <Compile Include="Events\RemovedArgs.cs" />
@@ -59,12 +60,11 @@
     <Compile Include="Models\RectangleVector.cs" />
     <Compile Include="Models\Terrain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="Modules\ConfigManager.cs" />
     <Compile Include="MemoryReader.cs" />
     <Compile Include="Enum\Levels.cs" />
     <Compile Include="Events\LogArgs.cs" />
-    <Compile Include="Modules\ImageManager.cs" />
+    <Compile Include="Modules\CartographerManager.cs" />
     <Compile Include="MapCore.cs" />
     <Compile Include="Config\Prop.cs" />
     <Compile Include="Config\Texture.cs" />

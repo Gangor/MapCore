@@ -209,6 +209,8 @@ namespace MapCore.Models
 			return vector;
 		}
 
+		#region Operator
+
 		public static bool operator ==(Vector left, Vector right)
 		{
 			return Equals(left, right);
@@ -290,5 +292,7 @@ namespace MapCore.Models
 				Y = point.Y
 			};
 		}
+
+		#endregion
 	}
 }

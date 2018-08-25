@@ -394,7 +394,7 @@ namespace MapCore
 					mem.Write(dwGrassColonyOffset);
 					mem.Write(dwEventAreaOffset);
 
-					Parent.Log(Levels.Good, "Ok\n");
+					Parent.Log(Levels.Success, "Ok\n");
 					return mem.ToArray();
 				}
 
@@ -707,7 +707,7 @@ namespace MapCore
 					}
 				}
 
-				Parent.Log(Levels.Good, "Ok\n");
+				Parent.Log(Levels.Success, "Ok\n");
 			}
 			catch (Exception exception)
 			{

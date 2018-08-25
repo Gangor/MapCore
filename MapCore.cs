@@ -28,7 +28,7 @@ namespace MapCore
 		/// <summary>
 		/// Get or set the file path
 		/// </summary>
-		public string Target;
+		public string Target { get; set; }
 
 		/// <summary>
 		/// Get or set the origine of the file
@@ -172,95 +172,16 @@ namespace MapCore
 
 		#endregion
 
-		#region Etc
-
-		/// <summary>
-		/// Dispose mapping
-		/// </summary>
-		public void Dispose()
-		{
-			_collisionManager.Dispose();
-			_regionManager.Dispose();
-			_eventAreaManager.Dispose();
-			_lightManager.Dispose();
-			_terrainManager.Dispose();
-			_unknowManager.Dispose();
-			_scriptManager.Dispose();
-			_waterManager.Dispose();
-			_potencialManager.Dispose();
-			_questPropManager.Dispose();
-
-			Reset?.Invoke(this, EventArgs.Empty);
-		}
-
-		/// <summary>
-		/// Make new project
-		/// </summary>
-		public void New(string file)
-		{
-			Dispose();
-			ResolveName(file);
-			SetSource(DataSource.FILE);
-
-			Log(Levels.Info, $"New project map {file}.\n");
-		}
-
-		/// <summary>
-		/// Resolve current location
-		/// </summary>
-		/// <param name="name"></param>
-		private void ResolveName(string name)
-		{
-			var match = Regex.Matches(name, "[0-9]+");
-			if (match.Count == 2)
-			{
-				Location.X = int.Parse(match[0].Value);
-				Location.Y = int.Parse(match[1].Value);
-			}
-			else
-			{
-				Location.X = 0;
-				Location.Y = 0;
-			}
-		}
-
-		/// <summary>
-		/// Resolve encoding file 
-		/// </summary>
-		/// 
-		/// <example>
-		/// m012_000(ascii)
-		/// </example>
-		/// <param name="name"></param>
-		/// <returns>
-		/// turple :
-		/// value1 = m012_000
-		/// value2 = (ascii)
-		/// </returns>
-		public static (string, string) ResolveEncode(string name)
-		{
-			var realname = name;
-			var codepage = string.Empty;
-
-			var match = Regex.Match(name, @"(\(.*?\))");
-			if (match.Success)
-			{
-				codepage = match.Groups[1].Value;
-				realname = name.Replace(codepage, string.Empty);
-			}
-			return (realname, codepage);
-		}
-
-		#endregion
-
 		#region Export
 
 		/// <summary>
 		/// Saving all file from data
 		/// </summary>
-		public void Export()
+		public void Export(string directory)
 		{
 			Log(Levels.Info, $"Export map {Name} with DataCore...");
+
+			_core.Load(directory);
 
 			Export($"{Name}.nfa", _collisionManager.GetBuffer);
 			Export($"{Name}.nfc", _regionManager.GetBuffer);
@@ -304,6 +225,7 @@ namespace MapCore
 			Dispose();
 			ResolveName(file);
 			SetSource(DataSource.CORE);
+			SetPath(directory);
 
 			Log(Levels.Info, $"Import map {file} with DataCore...");
 
@@ -415,7 +337,7 @@ namespace MapCore
 			switch (Source)
 			{
 				case DataSource.FILE: Save(Target);		break;
-				case DataSource.CORE: Export();			break;
+				case DataSource.CORE: Export(Target);	break;
 			}
 		}
 
@@ -520,6 +442,25 @@ namespace MapCore
 		#endregion
 
 		/// <summary>
+		/// Dispose mapping
+		/// </summary>
+		public void Dispose()
+		{
+			_collisionManager.Dispose();
+			_regionManager.Dispose();
+			_eventAreaManager.Dispose();
+			_lightManager.Dispose();
+			_terrainManager.Dispose();
+			_unknowManager.Dispose();
+			_scriptManager.Dispose();
+			_waterManager.Dispose();
+			_potencialManager.Dispose();
+			_questPropManager.Dispose();
+
+			Reset?.Invoke(this, EventArgs.Empty);
+		}
+
+		/// <summary>
 		/// Log push event
 		/// </summary>
 		/// <param name="level"></param>
@@ -528,9 +469,67 @@ namespace MapCore
 		{
 			Logger?.Invoke(this, new LogArgs(level, message));
 
-			#if DEBUG == true
+#if DEBUG == true
 				Console.Write(message);
-			#endif
+#endif
+		}
+
+		/// <summary>
+		/// Make new project
+		/// </summary>
+		public void New(string file)
+		{
+			Dispose();
+			ResolveName(file);
+			SetSource(DataSource.FILE);
+
+			Log(Levels.Info, $"New project map {file}.\n");
+		}
+
+		/// <summary>
+		/// Resolve current location
+		/// </summary>
+		/// <param name="name"></param>
+		private void ResolveName(string name)
+		{
+			var match = Regex.Matches(name, "[0-9]+");
+			if (match.Count == 2)
+			{
+				Location.X = int.Parse(match[0].Value);
+				Location.Y = int.Parse(match[1].Value);
+			}
+			else
+			{
+				Location.X = 0;
+				Location.Y = 0;
+			}
+		}
+
+		/// <summary>
+		/// Resolve encoding file 
+		/// </summary>
+		/// 
+		/// <example>
+		/// m012_000(ascii)
+		/// </example>
+		/// <param name="name"></param>
+		/// <returns>
+		/// turple :
+		/// value1 = m012_000
+		/// value2 = (ascii)
+		/// </returns>
+		public static (string, string) ResolveEncode(string name)
+		{
+			var realname = name;
+			var codepage = string.Empty;
+
+			var match = Regex.Match(name, @"(\(.*?\))");
+			if (match.Success)
+			{
+				codepage = match.Groups[1].Value;
+				realname = name.Replace(codepage, string.Empty);
+			}
+			return (realname, codepage);
 		}
 
 		/// <summary>
