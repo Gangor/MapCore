@@ -1,8 +1,8 @@
 ﻿#pragma warning disable CS1591
 
-namespace MapCore.Config
+namespace MapCore.Models
 {
-	public class Prop
+	public class PropInfo
 	{
 		public uint Id { get; set; }
 		public string Category { get; set; }

@@ -13,7 +13,7 @@
 		/// <summary>
 		/// Get or set the picture lenght
 		/// </summary>
-		public static int PictureLenght { get; } = 2048;
+		public static int PictureLenght { get; } = 8064;
 
 		/// <summary>
 		/// Get or set the map lenght
@@ -21,9 +21,9 @@
 		public static int TerrainLenght => (int)(SegmentCountPerMap * TileCountPerSegment * TileLenght);
 
 		/// <summary>
-		/// Get or set the coordonate scale for conversion
+		/// Get the ratio of the point
 		/// </summary>
-		public static float ScaleRatio { get; } = 7.875f;
+		public static float AttrLenght { get; } = 0.125f;
 
 		/// <summary>
 		/// Get or set the segment count

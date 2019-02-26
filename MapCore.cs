@@ -210,6 +210,19 @@ namespace MapCore
 			_core.ImportFileEntry(filename, action());
 		}
 
+		/// <summary>
+		/// Export file one by one from data
+		/// </summary>
+		/// <param name="filename"></param>
+		/// <param name="action"></param>
+		private void Export(string filename, Func<float, byte[]> action)
+		{
+			var attrLen = Global.TileLenght * Global.AttrLenght;
+
+			Log(Levels.Info, $"Exporting {filename}...\t");
+			_core.ImportFileEntry(filename, action(attrLen));
+		}
+
 		#endregion
 
 		#region Import
@@ -265,6 +278,26 @@ namespace MapCore
 			}
 
 			action(_core.GetFileBytes(filename));
+		}
+
+		/// <summary>
+		/// Load file one by one by data
+		/// </summary>
+		/// <param name="filename"></param>
+		/// <param name="action"></param>
+		private void Import(string filename, Action<byte[], float> action)
+		{
+			var attrLen = Global.TileLenght * Global.AttrLenght;
+
+			Log(Levels.Info, $"Importing {filename}...\t");
+
+			if (!_core.GetEntryExists(filename))
+			{
+				Log(Levels.Warning, "Introuvable");
+				return;
+			}
+
+			action(_core.GetFileBytes(filename), attrLen);
 		}
 
 		#endregion
@@ -325,6 +358,28 @@ namespace MapCore
 			action(File.ReadAllBytes(fullname));
 		}
 
+		/// <summary>
+		/// Load file one by one
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="filename"></param>
+		/// <param name="action"></param>
+		private void Load(string path, string filename, Action<byte[], float> action)
+		{
+			var fullname = Path.Combine(path, filename);
+			var attrLen = Global.TileLenght * Global.AttrLenght;
+
+			Log(Levels.Info, $"Loading {filename}...\t");
+
+			if (!File.Exists(fullname))
+			{
+				Log(Levels.Warning, "Introuvable");
+				return;
+			}
+
+			action(File.ReadAllBytes(fullname), attrLen);
+		}
+
 		#endregion
 
 		#region Save
@@ -380,6 +435,26 @@ namespace MapCore
 
 			Log(Levels.Info, $"Saving {filename}...\t");
 			File.WriteAllBytes(fullname, action());
+		}
+
+		/// <summary>
+		/// Save file one by one
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="filename"></param>
+		/// <param name="action"></param>
+		private void Save(string path, string filename, Func<float, byte[]> action)
+		{
+			var fullname = Path.Combine(path, filename);
+			var attrLen = Global.TileLenght * Global.AttrLenght;
+
+			if (!Directory.Exists(path))
+			{
+				Directory.CreateDirectory(path);
+			}
+
+			Log(Levels.Info, $"Saving {filename}...\t");
+			File.WriteAllBytes(fullname, action(attrLen));
 		}
 
 		#endregion

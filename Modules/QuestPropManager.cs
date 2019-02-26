@@ -3,7 +3,6 @@ using MapCore.Events;
 using MapCore.Models;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -117,9 +116,9 @@ namespace MapCore
 
 						var vector = Props[i].Position.Clone();
 
-						vector.X *= 7.875f;
-						vector.Y *= 7.875f;
-						vector = vector.Rotate180FlipY();
+						vector.X *= Global.AttrLenght;
+                        vector.Y *= Global.AttrLenght;
+                        vector = vector.Rotate180FlipY();
 
 						mem.Write(vector.X);
 						mem.Write(vector.Y);
@@ -180,9 +179,9 @@ namespace MapCore
 
 						var vector = new Vector
 						{
-							X = mem.ReadSingle() / 7.875f,
-							Y = mem.ReadSingle() / 7.875f
-						};
+							X = mem.ReadSingle() / Global.AttrLenght,
+                            Y = mem.ReadSingle() / Global.AttrLenght
+                        };
 
 						prop.Position = vector.Rotate180FlipY();
 						prop.OffSet = mem.ReadSingle();

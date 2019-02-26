@@ -147,12 +147,12 @@ namespace MapCore
 					{
 						var rectangle = Respawns[i].Rectangle.Clone();
 
-						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.ScaleRatio / Global.TileLenght;
-						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.ScaleRatio / Global.TileLenght;
+						rectangle.LeftTop.X *= Global.AttrLenght;
+						rectangle.LeftTop.Y *= Global.AttrLenght;
 						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
 
-						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.ScaleRatio / Global.TileLenght;
-						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.ScaleRatio / Global.TileLenght;
+						rectangle.RightBottom.X *= Global.AttrLenght;
+						rectangle.RightBottom.Y *= Global.AttrLenght;
 						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
 
 						mem.Write((int)rectangle.LeftTop.X);
@@ -191,8 +191,8 @@ namespace MapCore
 
 						var vector = Props[i].Position;
 
-						vector.X *= 7.875f;
-						vector.Y *= 7.875f;
+						vector.X *= Global.AttrLenght;
+						vector.Y *= Global.AttrLenght;
 						vector = vector.Rotate180FlipY();
 
 						mem.Write(vector.X);
@@ -274,19 +274,16 @@ namespace MapCore
 					{
 						var location = new Respawn();
 
-						location.Rectangle.LeftTop = new Vector
-						{
-							X = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio,
-							Y = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio
-						}
-						.Rotate180FlipY();
+						location.Rectangle.LeftTop = new Vector();
 
-						location.Rectangle.RightBottom = new Vector
-						{
-							X = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio,
-							Y = mem.ReadInt32() * Global.TileLenght / Global.ScaleRatio
-						}
-						.Rotate180FlipY();
+						location.Rectangle.LeftTop.X = mem.ReadInt32() / Global.AttrLenght;
+						location.Rectangle.LeftTop.Y = mem.ReadInt32() / Global.AttrLenght;
+						location.Rectangle.LeftTop = location.Rectangle.LeftTop.Rotate180FlipY();
+
+						location.Rectangle.RightBottom = new Vector();
+						location.Rectangle.RightBottom.X = mem.ReadInt32() / Global.AttrLenght;
+						location.Rectangle.RightBottom.Y = mem.ReadInt32() / Global.AttrLenght;
+						location.Rectangle.RightBottom = location.Rectangle.RightBottom.Rotate180FlipY();
 
 						var stringSize = mem.ReadInt32();
 						location.Description = Encoding.Default.GetString(mem.ReadBytes(stringSize));
@@ -319,8 +316,8 @@ namespace MapCore
 
 						var vector = new Vector
 						{
-							X = mem.ReadSingle() / 7.875f,
-							Y = mem.ReadSingle() / 7.875f
+							X = mem.ReadSingle() / Global.AttrLenght,
+							Y = mem.ReadSingle() / Global.AttrLenght,
 						};
 
 						propScript.Position = vector.Rotate180FlipY();

@@ -1,8 +1,8 @@
 ﻿#pragma warning disable CS1591
 
-namespace MapCore.Config
+namespace MapCore.Models
 {
-	public class Texture
+	public class TextureInfo
 	{
 		public ushort Id { get; set; }
 		public string Detail { get; set; }

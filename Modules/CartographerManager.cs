@@ -7,10 +7,10 @@ using System.Linq;
 
 namespace MapCore
 {
-	/// <summary>
-	/// Manage the map picture
-	/// </summary>
-	public class CartographerManager : IDisposable
+    /// <summary>
+    /// Manage the map picture
+    /// </summary>
+    public class CartographerManager : IDisposable
 	{
 		private bool _disposed = false;
 

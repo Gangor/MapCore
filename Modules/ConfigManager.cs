@@ -1,4 +1,4 @@
-﻿using MapCore.Config;
+﻿using MapCore.Models;
 using MapCore.Enum;
 using System;
 using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace MapCore
 		/// <summary>
 		/// Get or set the list of all prop
 		/// </summary>
-		public List<Prop> Props { get; set; } = new List<Prop>();
+		public List<PropInfo> Props { get; set; } = new List<PropInfo>();
 
 		/// <summary>
 		/// Get or set the list of all texture
 		/// </summary>
-		public List<Texture> Textures { get; set; } = new List<Texture>();
+		public List<TextureInfo> Textures { get; set; } = new List<TextureInfo>();
 
 		/// <summary>
 		/// Initialize a new instance
@@ -67,7 +67,7 @@ namespace MapCore
 								var values = properties[1].Split(new char[] { ',' }, 2);
 								if (values.Length == 2)
 								{
-									var prop = new Prop();
+									var prop = new PropInfo();
 									prop.Id = uint.Parse(values[0]);
 									prop.Category = category;
 									prop.PropName = values[1];
@@ -85,7 +85,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Props = new List<Prop>();
+				Props = new List<PropInfo>();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, string.Format("Cfg::Prop::Load<Exception> -> {0}\n", exception));
 			}
@@ -121,7 +121,7 @@ namespace MapCore
 								var values = properties[1].Split(new char[] { ',' }, 2);
 								if (values.Length == 2)
 								{
-									var texture = new Texture();
+									var texture = new TextureInfo();
 									texture.Id = ushort.Parse(values[0]);
 									texture.Detail = details;
 									texture.Category = category;
@@ -137,7 +137,7 @@ namespace MapCore
 			}
 			catch (Exception exception)
 			{
-				Textures = new List<Texture>();
+				Textures = new List<TextureInfo>();
 				Parent.Log(Levels.Error, "Failed\n");
 				Parent.Log(Levels.Fatal, string.Format("Cfg::Texture::Load<Exception> -> {0}\n", exception));
 			}

@@ -68,11 +68,11 @@ namespace MapCore
 				Rectangle = new RectangleVector
 				{
 					LeftTop = first,
-					RightBottom = last,
-					Center = Utils.GetCenterPoint(first, last),
+					RightBottom = last
 				}
 			};
-			
+
+			water.Rectangle.Center = water.Rectangle.GetCenterPoint();
 			Waters.Add(water);
 
 			Added?.Invoke(this, new AddedArgs(water, typeof(Water)));
@@ -103,16 +103,16 @@ namespace MapCore
 					{
 						var rectangle = Waters[i].Rectangle.Clone();
 
-						rectangle.LeftTop.X = rectangle.LeftTop.X * Global.ScaleRatio;
-						rectangle.LeftTop.Y = rectangle.LeftTop.Y * Global.ScaleRatio;
+						rectangle.LeftTop.X *= Global.AttrLenght;
+						rectangle.LeftTop.Y *= Global.AttrLenght;
 						rectangle.LeftTop = rectangle.LeftTop.Rotate180FlipY();
 
-						rectangle.RightBottom.X = rectangle.RightBottom.X * Global.ScaleRatio;
-						rectangle.RightBottom.Y = rectangle.RightBottom.Y * Global.ScaleRatio;
+						rectangle.RightBottom.X *= Global.AttrLenght;
+						rectangle.RightBottom.Y *= Global.AttrLenght;
 						rectangle.RightBottom = rectangle.RightBottom.Rotate180FlipY();
 
-						rectangle.Center.X = rectangle.Center.X * Global.ScaleRatio;
-						rectangle.Center.Y = rectangle.Center.Y * Global.ScaleRatio;
+						rectangle.Center.X *= Global.AttrLenght;
+						rectangle.Center.Y *= Global.AttrLenght;
 						rectangle.Center = rectangle.RightBottom.Rotate180FlipY();
 
 						mem.Write((int)rectangle.LeftTop.X);
@@ -159,24 +159,24 @@ namespace MapCore
 
 						water.Rectangle.LeftTop = new Vector
 						{
-							X = mem.ReadSingle() / Global.ScaleRatio,
-							Y = mem.ReadSingle() / Global.ScaleRatio,
+							X = mem.ReadSingle() / Global.AttrLenght,
+							Y = mem.ReadSingle() / Global.AttrLenght,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.RightBottom = new Vector
 						{
-							X = mem.ReadSingle() / Global.ScaleRatio,
-							Y = mem.ReadSingle() / Global.ScaleRatio,
+							X = mem.ReadSingle() / Global.AttrLenght,
+							Y = mem.ReadSingle() / Global.AttrLenght,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();
 
 						water.Rectangle.Center = new Vector
 						{
-							X = mem.ReadSingle() / Global.ScaleRatio,
-							Y = mem.ReadSingle() / Global.ScaleRatio,
+							X = mem.ReadSingle() / Global.AttrLenght,
+							Y = mem.ReadSingle() / Global.AttrLenght,
 							Z = mem.ReadSingle()
 						}
 						.Rotate180FlipY();

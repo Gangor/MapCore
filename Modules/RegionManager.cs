@@ -125,9 +125,9 @@ namespace MapCore
 							{
 								var vector = Regions[i].Polygons[p][n].Clone();
 
-								vector.X *= 7.875f;
-								vector.Y *= 7.875f;
-								vector = vector.Rotate180FlipY();
+                                vector.X *= Global.AttrLenght;
+                                vector.Y *= Global.AttrLenght;
+                                vector = vector.Rotate180FlipY();
 
 								mem.Write((int)vector.X);
 								mem.Write((int)vector.Y);
@@ -185,9 +185,9 @@ namespace MapCore
 							{
 								var vector = new Vector
 								{
-									X = mem.ReadInt32() / 7.875f,
-									Y = mem.ReadInt32() / 7.875f
-								};
+									X = mem.ReadInt32() / Global.AttrLenght,
+									Y = mem.ReadInt32() / Global.AttrLenght
+                                };
 								
 								polygon.Add(vector.Rotate180FlipY());
 							}

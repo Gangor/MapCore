@@ -101,8 +101,8 @@ namespace MapCore
 							{
 								var vector = Records[i].Polygons[p][t].Clone();
 
-								vector.X *= 7.875f;
-								vector.Y *= 7.875f;
+								vector.X *= Global.AttrLenght;
+								vector.Y *= Global.AttrLenght;
 								vector = vector.Rotate180FlipY();
 
 								mem.Write(vector.X);
@@ -159,8 +159,8 @@ namespace MapCore
 							{
 								var vector = new Vector
 								{
-									X = mem.ReadSingle() / 7.875f,
-									Y = mem.ReadSingle() / 7.875f,
+									X = mem.ReadSingle() / Global.AttrLenght,
+									Y = mem.ReadSingle() / Global.AttrLenght,
 									Z = mem.ReadSingle()
 								};
 
